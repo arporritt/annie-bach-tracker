@@ -1372,7 +1372,7 @@
     <div class="top-row">
       <span class="top-label">Progress</span>
       <span class="top-count">
-        <span id="done-count">0</span><span class="total" id="total-count"> / 60</span>
+        <span id="done-count">0</span><span class="total" id="total-count"> / 47</span>
         <span class="pct" id="pct-count">0%</span>
         <span class="behind-count" id="behind-count"></span>
       </span>
@@ -1643,84 +1643,63 @@ const WEEKS = [
 ];
 
 const SEED_TASKS = [
-  // NOW (May 18-24)
-  { week:'now', track:'logistics', label:'Send save-the-date message to all guests', note:'Include dates, location, expected costs', pills:['urgent'] },
-  { week:'now', track:'logistics', label:'Create group text or WhatsApp for planning', note:'', pills:[] },
-  { week:'now', track:'chi',       label:'Confirm Airbnb booking + deposit', note:'767 Phoenix St, South Haven, MI', pills:['urgent','financial'] },
-  { week:'now', track:'family',    label:'Send invitation website link to guests', note:'arporritt.github.io/annie-bachelorette', pills:[] },
-  { week:'now', track:'money',     label:'Set up Splitwise group for shared costs', note:'', pills:[] },
-  { week:'now', track:'logistics', label:'Coordinate driving / rideshare from Chicago', note:'Who has cars? Who carpools?', pills:[] },
-
-  // W1 (May 25-31)
-  { week:'w1', track:'family',     label:'Track RSVPs as they come in', note:'', pills:[] },
-  { week:'w1', track:'family',     label:'Collect dietary restrictions + allergies', note:'', pills:[] },
-  { week:'w1', track:'family',     label:'Collect any guest-specific must-haves', note:'Sweatshirt sizes, drink preferences', pills:[] },
-  { week:'w1', track:'logistics',  label:'Map driving routes / share addresses', note:'', pills:[] },
-  { week:'w1', track:'chi',        label:'Confirm Airbnb amenities: kitchen, AC, parking', note:'Will impact what we bring', pills:[] },
-
-  // W2 (Jun 1-7)
-  { week:'w2', track:'wi',         label:'Book boat rental for Saturday afternoon', note:'11:30 AM – 4:00 PM. Confirm capacity for group', pills:['urgent','financial'] },
-  { week:'w2', track:'wi',         label:'Book magician for Saturday 6:30–7:30 PM', note:'In-house performance at Airbnb', pills:['financial'] },
-  { week:'w2', track:'wi',         label:'Book private yoga instructor (Saturday 9 AM)', note:'In-house, all levels', pills:['financial'] },
-  { week:'w2', track:'wi',         label:'Research / book sunset photographer at lighthouse', note:'Optional but worth pricing out', pills:[] },
-
-  // W3 (Jun 8-14)
-  { week:'w3', track:'wi',         label:'Reserve winery tasting Friday 12-4 PM', note:'Pick 1-2 wineries near South Haven', pills:[] },
-  { week:'w3', track:'rentback',   label:'Book Friday lunch reservation', note:'Between wineries', pills:[] },
-  { week:'w3', track:'rentback',   label:'Make Saturday dinner reservation', note:'8-10 PM, group of N', pills:['urgent'] },
-  { week:'w3', track:'wi',         label:'Pick Saturday night venue (Flavortown / dancing)', note:'Reserve table or bottle service if needed', pills:[] },
-  { week:'w3', track:'logistics',  label:'Confirm check-in / check-out logistics with Airbnb', note:'4 PM Fri / 11 AM Sun', pills:[] },
-
-  // W4 (Jun 15-21)
-  { week:'w4', track:'family',     label:'RSVP deadline — chase non-responders', note:'', pills:['deadline','urgent'] },
-  { week:'w4', track:'admin',      label:'Source Flavortown outfits + accessories', note:'Themed fits for Saturday night', pills:[] },
-  { week:'w4', track:'admin',      label:'Order bachelorette sash, tiara, decor', note:'Amazon / Etsy', pills:[] },
-  { week:'w4', track:'admin',      label:'Buy bachelorette games (Mr & Mrs, drinking games, etc.)', note:'', pills:[] },
-  { week:'w4', track:'admin',      label:'Plan welcome bag contents', note:'Snacks, hangover kit, schedule card', pills:[] },
-
-  // W5 (Jun 22-28)
-  { week:'w5', track:'family',     label:'Lock final headcount with all vendors', note:'Boat, dinner, magician, yoga', pills:['deadline'] },
-  { week:'w5', track:'money',      label:'Calculate per-person cost estimate', note:'Send breakdown to group', pills:['financial'] },
-  { week:'w5', track:'money',      label:'Collect deposits from guests if needed', note:'Via Splitwise / Venmo', pills:['financial'] },
-  { week:'w5', track:'admin',      label:'Order custom items (shirts, mugs, signs)', note:'Shipping takes 1-2 weeks', pills:[] },
-  { week:'w5', track:'rentback',   label:'Plan grocery list for Airbnb breakfasts + Friday pizza night', note:'', pills:[] },
-
-  // W6 (Jun 29-Jul 5)
-  { week:'w6', track:'logistics',  label:'Design + print itinerary cards', note:'1 per guest in welcome bag', pills:[] },
-  { week:'w6', track:'admin',      label:'Buy decorations: balloons, banners, table props', note:'', pills:[] },
-  { week:'w6', track:'admin',      label:'Gather PJs / robes / matching swag', note:'Friday night cozy vibes', pills:[] },
-  { week:'w6', track:'rentback',   label:'Order pizza party supplies (or finalize pizza order)', note:'Friday night dinner in', pills:[] },
-  { week:'w6', track:'family',     label:'Share final detailed itinerary with group', note:'', pills:[] },
-
-  // W7 (Jul 6-12)
-  { week:'w7', track:'wi',         label:'Reconfirm boat rental + arrival time', note:'Get dock address + captain contact', pills:[] },
-  { week:'w7', track:'wi',         label:'Reconfirm magician + setup needs', note:'Arrival time, space needed, payment', pills:[] },
-  { week:'w7', track:'wi',         label:'Reconfirm yoga instructor', note:'Mats? Music? Address', pills:[] },
-  { week:'w7', track:'rentback',   label:'Reconfirm Saturday dinner reservation + dietary needs', note:'', pills:[] },
-  { week:'w7', track:'wi',         label:'Reconfirm Saturday night venue / bottle service', note:'', pills:[] },
-
-  // W8 (Jul 13-19)
-  { week:'w8', track:'rentback',   label:'Final grocery list — finalize and assign shoppers', note:'', pills:[] },
-  { week:'w8', track:'admin',      label:'Assemble welcome bags', note:'', pills:[] },
-  { week:'w8', track:'logistics',  label:'Pack: bachelorette swag, games, decor', note:'', pills:[] },
-  { week:'w8', track:'logistics',  label:'Confirm cars + drivers + departure times', note:'', pills:[] },
-  { week:'w8', track:'rentback',   label:'Stock drinks: wine, champagne, mixers, water', note:'', pills:[] },
-  { week:'w8', track:'admin',      label:'Pack outfits: wineries, boat, Flavortown', note:'', pills:[] },
-  { week:'w8', track:'logistics',  label:'Confirm sunscreen + lake-day essentials', note:'Hats, sunnies, towels', pills:[] },
-
-  // W9 (Jul 20-26) - THE WEEKEND
-  { week:'w9', track:'logistics',  label:'Drive to South Haven — Friday', note:'Check-in 4 PM (drop bags earlier)', pills:['urgent'] },
-  { week:'w9', track:'wi',         label:'Friday: Wineries + Lunch + Town', note:'12-4 PM', pills:[] },
-  { week:'w9', track:'wi',         label:'Friday: Sunset at the Lighthouse', note:'6-7 PM, cameras ready', pills:[] },
-  { week:'w9', track:'rentback',   label:'Friday: Pizza night + games + PJs', note:'7:30 PM on', pills:[] },
-  { week:'w9', track:'wi',         label:'Saturday: In-house yoga 9 AM', note:'', pills:[] },
-  { week:'w9', track:'wi',         label:'Saturday: Boat day 11:30 AM – 4 PM', note:'', pills:[] },
-  { week:'w9', track:'wi',         label:'Saturday: Magician 6:30 PM', note:'', pills:[] },
-  { week:'w9', track:'rentback',   label:'Saturday: Dinner 8-10 PM', note:'', pills:[] },
-  { week:'w9', track:'wi',         label:'Saturday: Flavortown 10 PM on', note:'Dancing + drinks', pills:[] },
-  { week:'w9', track:'logistics',  label:'Sunday: Pack + check out 11 AM', note:'', pills:[] },
-  { week:'w9', track:'wi',         label:'Sunday: Shopping + farmers market + send-off', note:'', pills:[] },
-  { week:'w9', track:'money',      label:'Settle Splitwise totals after weekend', note:'', pills:[] }
+  // ===== NOW =====
+  { week:'now', track:'family', label:'Create list of invitees', note:'', owner:'Annie', done:true, pills:[] },
+  { week:'now', track:'logistics', label:'Book Airbnb', note:'767 Phoenix Street, South Haven', owner:'Allie', done:true, pills:[] },
+  { week:'now', track:'wi', label:'Create loose itinerary', note:'', owner:'Both', done:true, pills:[] },
+  { week:'now', track:'wi', label:'Decide on beach set-up company', note:'Decision: no', owner:'Both', done:true, pills:[] },
+  { week:'now', track:'family', label:'Create shared planning doc', note:'', owner:'Allie', done:true, pills:[] },
+  { week:'now', track:'family', label:'Confirm final guest list — lock headcount', note:'7 confirmed, 5 TBD, 1 declined as of May 19', owner:'Allie', pills:['urgent'] },
+  { week:'now', track:'family', label:'Send initial invite with high-level info', note:'Due Jan 31 — overdue', owner:'Allie', pills:['urgent'] },
+  { week:'now', track:'admin', label:'Confirm bachelorette theme', note:'Engaged & unbothered? Lake Gresham? Flavortown?', owner:'Annie', pills:['urgent'] },
+  { week:'now', track:'family', label:'Create shared photo library', note:'Google Photos album', owner:'Allie', pills:['urgent'] },
+  { week:'now', track:'wi', label:'Book magician / entertainer', note:'Contract signed for 7/25 — confirm vendor', owner:'Both', pills:['urgent', 'financial'] },
+  { week:'now', track:'wi', label:'Book boat rental / charter', note:'Pontoon or captained', owner:'Both', pills:['urgent', 'financial'] },
+  { week:'now', track:'wi', label:'Pick + reserve wineries and restaurants', note:'Friday lunch route', owner:'Annie', pills:['urgent'] },
+  { week:'now', track:'family', label:'Send follow-up email with details + invoice', note:'Due Apr 30 — overdue. Include themed outfits.', owner:'Allie', pills:['urgent'] },
+  // ===== W1 =====
+  { week:'w1', track:'admin', label:'Order bachelorette decorations', note:'Balloons, banners', owner:'Allie', pills:[] },
+  { week:'w1', track:'admin', label:'Order bachelorette outfits / accessories', note:'Hats, sashes', owner:'Allie', pills:[] },
+  { week:'w1', track:'admin', label:'Create outfit plan', note:'Friday wineries / Sat boat / Sat night', owner:'Allie', pills:[] },
+  { week:'w1', track:'rentback', label:'Reserve Friday dinner (optional)', note:'Casual welcome. Annie picks restaurant.', owner:'Allie', pills:[] },
+  { week:'w1', track:'rentback', label:'Reserve Saturday dinner', note:'Downtown South Haven. Or chef at house?', owner:'Allie', pills:[] },
+  // ===== W2 =====
+  { week:'w2', track:'money', label:'Collect deposits / Venmo from guests', note:'Include buffer for surprises', owner:'Allie', pills:['financial'] },
+  { week:'w2', track:'wi', label:'Book yoga teacher', note:'Saturday 9 AM in-house', owner:'Both', pills:[] },
+  // ===== W3 =====
+  { week:'w3', track:'admin', label:'Plan something special for Ceci', note:'', owner:'Both', pills:[] },
+  { week:'w3', track:'admin', label:'Pick bachelorette games', note:'Mr & Mrs, drinking games, etc.', owner:'Allie', pills:[] },
+  // ===== W4 =====
+  { week:'w4', track:'logistics', label:'Assign boat day supplies', note:'Drinks, towels, speaker', owner:'Allie', pills:[] },
+  // ===== W5 =====
+  { week:'w5', track:'rentback', label:'Plan brunch spot or groceries', note:'Dine out vs cook', owner:'Allie', pills:[] },
+  { week:'w5', track:'logistics', label:'Assign beach day supplies', note:'Chairs, umbrellas', owner:'Allie', pills:[] },
+  // ===== W6 =====
+  { week:'w6', track:'admin', label:'Print out photos', note:'', owner:'Allie', pills:[] },
+  // ===== W7 =====
+  { week:'w7', track:'logistics', label:'Confirm transportation plan', note:'Carpools, buses, Ubers, DDs', owner:'Allie', pills:[] },
+  { week:'w7', track:'wi', label:'Reconfirm any reservations', note:'Weather + arrival time', owner:'Allie', pills:[] },
+  // ===== W8 =====
+  { week:'w8', track:'family', label:'Send final itinerary to group', note:'Addresses + reminders', owner:'Allie', pills:['urgent'] },
+  { week:'w8', track:'rentback', label:'Assign grocery run', note:'Alcohol + food', owner:'Katie & Annie', pills:[] },
+  { week:'w8', track:'rentback', label:'Buy non-perishable supplies', note:'Cups, straws, napkins', owner:'Both', pills:[] },
+  // ===== W9 =====
+  { week:'w9', track:'logistics', label:'Check on early check-in with Airbnb', note:'Day before', owner:'Allie', pills:[] },
+  { week:'w9', track:'logistics', label:'Bring cash for tips', note:'Boat captain, magician', owner:'Allie', pills:['urgent'] },
+  { week:'w9', track:'wi', label:'Friday: Wineries + lunch + town (12 – 4 PM)', note:'Annie picks wineries', pills:[] },
+  { week:'w9', track:'logistics', label:'Friday: Check-in + get ready (4 – 6 PM)', note:'', pills:[] },
+  { week:'w9', track:'wi', label:'Friday: Sunset at the lighthouse (6 – 7 PM)', note:'Cameras ready', pills:[] },
+  { week:'w9', track:'rentback', label:'Friday: Dinner out (7:30 – 9 PM)', note:'Annie picks restaurant', pills:[] },
+  { week:'w9', track:'admin', label:'Friday: Matching sets + games + girlie things', note:'Back at the house', pills:[] },
+  { week:'w9', track:'rentback', label:'Saturday: Breakfast at home (8 – 9 AM)', note:'', pills:[] },
+  { week:'w9', track:'wi', label:'Saturday: In-house yoga (9 – 10 AM)', note:'', pills:[] },
+  { week:'w9', track:'wi', label:'Saturday: Boat day (12 – 4 PM)', note:'', pills:[] },
+  { week:'w9', track:'wi', label:'Saturday: Magician (6:30 – 7:30 PM)', note:'Contract booked', pills:[] },
+  { week:'w9', track:'rentback', label:'Saturday: Dinner (8 – 10 PM)', note:'Maybe chef after magician?', pills:[] },
+  { week:'w9', track:'wi', label:'Saturday: Go out (10 PM on)', note:'', pills:[] },
+  { week:'w9', track:'logistics', label:'Sunday: Pack up + check out (9 – 10:30 AM)', note:'', pills:[] },
+  { week:'w9', track:'wi', label:'Sunday: Shopping + farmers market + group hug', note:'10:30 AM – 1 PM', pills:[] },
+  { week:'w9', track:'money', label:'Add to Splitwise + true up costs', note:'After weekend', owner:'Allie', pills:[] },
 ];
 
 // ============================================================
@@ -1752,8 +1731,8 @@ function seedState() {
     label: t.label,
     note: t.note || '',
     pills: t.pills || [],
-    owner: '',
-    done: !!oldDone[hashLabel(t.label)]
+    owner: t.owner || '',
+    done: t.done || !!oldDone[hashLabel(t.label)]
   }));
 
   return {
@@ -1910,6 +1889,7 @@ async function initApp() {
   }
   // Migrate any tasks still on the removed 'beyond' week
   state.tasks.forEach(t => { if (t.week === 'beyond') t.week = 'w15'; });
+  prepopulateCustomOwners();
   cloudReady = true;
   applyWeekFilterButtons();
   refreshOwnerFilters();
@@ -2743,6 +2723,12 @@ function renderActive() {
 }
 
 let weekFilters = { empty: false, past: false, done: false };
+// Pre-known custom owners for bach tracker
+function prepopulateCustomOwners() {
+  if (!state) return;
+  if (!Array.isArray(state.customOwners)) state.customOwners = [];
+  ['Annie','Katie & Annie'].forEach(o => { if (!state.customOwners.includes(o)) state.customOwners.push(o); });
+}
 try {
   const saved = localStorage.getItem('mt-week-filters');
   if (saved) weekFilters = { ...weekFilters, ...JSON.parse(saved) };
