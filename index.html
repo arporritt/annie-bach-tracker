@@ -1292,6 +1292,100 @@
     .sync-pill { bottom: 10px; right: 10px; padding: 5px 10px; font-size: 10.5px; gap: 5px; }
     .sync-pill .dot { width: 6px; height: 6px; }
   }
+
+  /* ============ DATA TABS (guests/ideas/itinerary) ============ */
+  .data-shell { max-width: 1240px; width: 100%; margin: 0 auto; padding: 32px 40px 64px; box-sizing: border-box; }
+  .data-toolbar { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+  .data-title { font-family: 'Fraunces', serif; font-size: 32px; font-weight: 400; letter-spacing: -0.02em; color: var(--ink); }
+  .data-meta { font-size: 12px; color: var(--ink-faint); font-style: italic; flex: 1; margin-left: 12px; }
+  .data-add-btn {
+    background: var(--clay); color: white;
+    border: none; border-radius: 100px; padding: 8px 16px;
+    font-family: 'Manrope', sans-serif; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer;
+    transition: background 0.15s;
+  }
+  .data-add-btn:hover { background: var(--plum); }
+  .data-table-wrap {
+    overflow-x: auto;
+    background: var(--bg-card);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+  }
+  .data-table { width: 100%; border-collapse: collapse; }
+  .data-table th, .data-table td {
+    padding: 10px 12px; text-align: left;
+    font-family: 'Manrope', sans-serif; font-size: 13px;
+    border-bottom: 1px solid var(--rule-soft);
+    vertical-align: middle;
+  }
+  .data-table th {
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ink-faint); font-weight: 700;
+    background: rgba(122,160,194,0.06);
+    border-bottom: 1px solid var(--rule);
+    white-space: nowrap;
+    position: sticky; top: 0;
+  }
+  .data-table td.dt-num, .data-table th.dt-num { color: var(--ink-faint); font-variant-numeric: tabular-nums; width: 36px; text-align: center; }
+  .data-table td.dt-actions, .data-table th.dt-actions { width: 36px; text-align: center; padding: 4px; }
+  .data-table tr:hover td { background: rgba(122,160,194,0.04); }
+  .data-cell {
+    display: block; min-height: 18px;
+    padding: 4px 6px; border-radius: 4px;
+    outline: none; cursor: text;
+    white-space: pre-wrap; word-break: break-word;
+  }
+  .data-cell:focus { background: white; box-shadow: 0 0 0 2px rgba(122,160,194,0.3); }
+  .data-cell:empty::before {
+    content: attr(data-placeholder);
+    color: var(--ink-faint); font-style: italic; pointer-events: none;
+  }
+  .data-cell.rsvp-confirmed { color: var(--forest); font-weight: 600; }
+  .data-cell.rsvp-tbd { color: var(--clay); font-style: italic; }
+  .data-cell.rsvp-declined { color: var(--ink-faint); text-decoration: line-through; }
+  .data-del-btn {
+    background: transparent; border: none; cursor: pointer;
+    font-size: 15px; color: var(--ink-faint);
+    padding: 4px 8px; border-radius: 4px;
+    opacity: 0.5; transition: opacity 0.15s, color 0.15s;
+  }
+  .data-table tr:hover .data-del-btn { opacity: 1; }
+  .data-del-btn:hover { color: var(--behind); background: rgba(214,85,62,0.08); }
+  .data-section {
+    margin-bottom: 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .data-section-header {
+    padding: 14px 22px; border-bottom: 1px solid var(--rule);
+    background: linear-gradient(180deg, rgba(122,160,194,0.08), transparent);
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .data-section-name {
+    font-family: 'Fraunces', serif; font-size: 18px; font-weight: 500;
+    color: var(--ink); letter-spacing: -0.01em;
+  }
+  .data-section-add {
+    background: transparent; border: 1px dashed var(--rule);
+    border-radius: 100px; padding: 5px 14px;
+    font-size: 11px; color: var(--ink-faint); cursor: pointer;
+    font-family: 'Manrope', sans-serif; letter-spacing: 0.05em;
+  }
+  .data-section-add:hover { color: var(--clay); border-color: var(--clay-soft); }
+  .data-section .data-table-wrap { border: none; box-shadow: none; border-radius: 0; }
+  .data-section .data-table th { background: transparent; }
+  @media (max-width: 600px) {
+    .data-shell { padding: 18px 14px 48px; }
+    .data-title { font-size: 24px; }
+    .data-table th, .data-table td { padding: 7px 8px; font-size: 11.5px; }
+    .data-section-header { padding: 10px 14px; }
+    .data-section-name { font-size: 16px; }
+  }
 </style>
 
 <div id="sync-pill" class="sync-pill is-loading">
@@ -1411,18 +1505,6 @@
     <div class="meta-countdown" data-date="2026-07-24">…</div>
   </div>
   <div class="meta-cell"><div class="meta-label">Total Tasks</div><div class="meta-value" id="total-tasks">47</div></div>
-</div>
-  <div class="meta-cell">
-    <div class="meta-label">WI Closing</div>
-    <div class="meta-value">Jun 30 <span class="small">Tues</span></div>
-    <div class="meta-countdown" data-date="2026-06-30">in 45 days</div>
-  </div>
-  <div class="meta-cell">
-    <div class="meta-label">Move Out (CHI)</div>
-    <div class="meta-value">Jul 31 <span class="small">Fri</span></div>
-    <div class="meta-countdown" data-date="2026-07-31">in 76 days</div>
-  </div>
-  <div class="meta-cell"><div class="meta-label">Total Tasks</div><div class="meta-value" id="total-tasks">195</div></div>
 </div>
 
 <!-- ============ GANTT STRIP ============ -->
