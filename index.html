@@ -1466,7 +1466,7 @@
     <div class="top-row">
       <span class="top-label">Progress</span>
       <span class="top-count">
-        <span id="done-count">0</span><span class="total" id="total-count"> / 47</span>
+        <span id="done-count">0</span><span class="total" id="total-count"> / 64</span>
         <span class="pct" id="pct-count">0%</span>
         <span class="behind-count" id="behind-count"></span>
       </span>
@@ -1730,40 +1730,82 @@ const WEEKS = [
 ];
 
 const SEED_TASKS = [
-  { week:'w10', track:'house', label:"Create list of invitees", note:"", owner:"Annie", done:true, pills:[] },
-  { week:'w1', track:'house', label:"Confirm final guest list", note:"Lock headcount", owner:"Allie", done:false, pills:['urgent'] },
-  { week:'w1', track:'house', label:"Book AirBnb", note:"", owner:"Allie", done:true, pills:[] },
-  { week:'w3', track:'house', label:"Collect deposits / Venmo", note:"Include buffer", owner:"Allie", done:false, pills:[] },
-  { week:'w8', track:'house', label:"Confirm transportation plan", note:"Carpools, Buses (if needed), Ubers, DDs", owner:"Allie", done:false, pills:[] },
-  { week:'w1', track:'activities', label:"Create loose itinerary", note:"", owner:"Both", done:true, pills:[] },
-  { week:'w1', track:'activities', label:"Figure out if we're using a beach set-up company", note:"No", owner:"Both", done:true, pills:[] },
-  { week:'w1', track:'activities', label:"Research and book magician / entertainer", note:"In-home or pre-dinner Sat · Due: Februray 28", owner:"Both", done:false, pills:[] },
-  { week:'w1', track:'activities', label:"Research and book boat rental / charter", note:"Pontoon or captained + date · Due: Februray 28", owner:"Both", done:false, pills:[] },
-  { week:'w1', track:'activities', label:"Research and book yoga teacher", note:"Due: Februray 28", owner:"Both", done:false, pills:[] },
-  { week:'w1', track:'activities', label:"Research restaurants and wineries", note:"Due: Februray 28", owner:"Annie", done:false, pills:[] },
-  { week:'w1', track:'activities', label:"Figure out bachelorette games", note:"", owner:"Allie", done:false, pills:['urgent'] },
-  { week:'w1', track:'activities', label:"Figure out something special for Ceci", note:"", owner:"Both", done:false, pills:['urgent'] },
-  { week:'w8', track:'activities', label:"Reconfirm any reservations", note:"Weather + arrival time", owner:"Allie", done:false, pills:[] },
-  { week:'w6', track:'activities', label:"Assign beach day supplies", note:"Chairs, umbrellas", owner:"Allie", done:false, pills:[] },
-  { week:'w5', track:'activities', label:"Assign boat day supplies", note:"Drinks, towels, speaker", owner:"Allie", done:false, pills:[] },
-  { week:'w10', track:'activities', label:"Bring cash for tips", note:"Boat captain, magician", owner:"Allie", done:false, pills:[] },
-  { week:'w2', track:'food', label:"Reserve Friday dinner (optional)", note:"Casual welcome", owner:"Allie", done:false, pills:['urgent'] },
-  { week:'w2', track:'food', label:"Reserve Saturday dinner", note:"Downtown South Haven", owner:"Allie", done:false, pills:['urgent'] },
-  { week:'w6', track:'food', label:"Plan brunch spot or groceries", note:"Dine out vs cook", owner:"Allie", done:false, pills:[] },
-  { week:'w9', track:'food', label:"Assign grocery run", note:"Alcohol + food", owner:"Katie, Annie", done:false, pills:[] },
-  { week:'w9', track:'food', label:"Buy non-perishable supplies", note:"Cups, straws, napkins", owner:"Both", done:false, pills:[] },
-  { week:'w1', track:'outfits', label:"Confirm theme", note:"", owner:"Annie", done:false, pills:['urgent'] },
-  { week:'w2', track:'outfits', label:"Order bachelorette decorations", note:"Balloons, banners", owner:"Allie", done:false, pills:['urgent'] },
-  { week:'w2', track:'outfits', label:"Order bachelorette outfits / accessories", note:"Hats, sashes", owner:"Allie", done:false, pills:['urgent'] },
-  { week:'w2', track:'outfits', label:"Create outfit plan", note:"", owner:"Allie", done:false, pills:['urgent'] },
-  { week:'w7', track:'outfits', label:"Print out photos", note:"", owner:"Allie", done:false, pills:[] },
-  { week:'w1', track:'invites', label:"Create shared planning doc", note:"", owner:"Allie", done:true, pills:[] },
-  { week:'w1', track:'invites', label:"Create shared photo library", note:"", owner:"Allie", done:false, pills:['urgent'] },
-  { week:'w1', track:'invites', label:"Send initial invite with high-level information", note:"", owner:"Allie", done:false, pills:['urgent'] },
-  { week:'w1', track:'invites', label:"Send follow-up email with more details and invoice", note:"Include themed outfits", owner:"Allie", done:false, pills:['urgent'] },
-  { week:'w9', track:'invites', label:"Send final itinerary to group", note:"Addresses + reminders", owner:"Allie", done:false, pills:[] },
-  { week:'w10', track:'invites', label:"Check on early check-in", note:"", owner:"Allie", done:false, pills:[] },
-  { week:'w10', track:'invites', label:"Add to Splitwise and true to costs", note:"", owner:"Allie", done:false, pills:[] }
+  // ===== NOW =====
+  { week:'now', track:'logistics', label:'Create list of invitees', note:'', owner:'Annie', done:true, pills:[] },
+  { week:'now', track:'family', label:'Confirm final guest list — lock headcount', note:'', owner:'Allie', done:true, pills:[] },
+  { week:'now', track:'logistics', label:'Book Airbnb', note:'767 Phoenix Street, South Haven', owner:'Allie', done:true, pills:[] },
+  { week:'now', track:'wi', label:'Create loose itinerary', note:'', owner:'Both', done:true, pills:[] },
+  { week:'now', track:'wi', label:'Decide on beach set-up company', note:'Decision: no', owner:'Both', done:true, pills:[] },
+  { week:'now', track:'wi', label:'Book magician / entertainer', note:'Booked + contract signed for 7/25', owner:'Both', done:true, pills:[] },
+  { week:'now', track:'wi', label:'Book boat rental / charter', note:'Pontoon or captained', owner:'Both', done:true, pills:[] },
+  { week:'now', track:'wi', label:'Book yoga teacher', note:'Saturday 9 AM in-house', owner:'Both', done:true, pills:[] },
+  { week:'now', track:'admin', label:'Confirm bachelorette theme', note:'', owner:'Annie', done:true, pills:[] },
+  { week:'now', track:'admin', label:'Create outfit plan', note:'', owner:'Allie', done:true, pills:[] },
+  { week:'now', track:'family', label:'Create shared planning doc', note:'', owner:'Allie', done:true, pills:[] },
+  { week:'now', track:'family', label:'Send initial invite with high-level info', note:'', owner:'Allie', done:true, pills:[] },
+  { week:'now', track:'family', label:'Send follow-up email with details + invoice', note:'Includes themed outfits', owner:'Allie', done:true, pills:[] },
+  { week:'now', track:'wi', label:'Pick + reserve wineries and restaurants', note:'Friday lunch route', owner:'Annie', pills:['urgent'] },
+  { week:'now', track:'admin', label:'Pick bachelorette games', note:'Mr & Mrs, drinking games, etc. Past due 3/31', owner:'Allie', pills:['urgent'] },
+  { week:'now', track:'admin', label:'Plan something special for Ceci', note:'Past due 3/31', owner:'Both', pills:['urgent'] },
+  { week:'now', track:'family', label:'Create shared photo library', note:'Google Photos album — past due', owner:'Allie', pills:['urgent'] },
+  // ===== W1 =====
+  { week:'w1', track:'admin', label:'Order bachelorette decorations', note:'Balloons, banners — due 5/30', owner:'Allie', pills:[] },
+  { week:'w1', track:'admin', label:'Order bachelorette outfits / accessories', note:'Hats, sashes — due 5/30', owner:'Allie', pills:[] },
+  { week:'w1', track:'rentback', label:'Reserve Friday dinner', note:'Casual welcome — Annie picks restaurant', owner:'Allie', pills:[] },
+  { week:'w1', track:'rentback', label:'Reserve Saturday dinner', note:'Downtown South Haven OR chef at house', owner:'Allie', pills:[] },
+  { week:'w1', track:'admin', label:'Collect t-shirt / sweatshirt sizes from guests', note:'Add to guest sheet column. Needed before ordering.', owner:'Allie', pills:['urgent'] },
+  { week:'w1', track:'admin', label:'Decide swag bag contents', note:'Sweatshirt, hat, tote, water bottle, lip gloss, hangover kit, custom sticker, koozie?', owner:'Both', pills:[] },
+  // ===== W2 =====
+  { week:'w2', track:'admin', label:'Order custom sweatshirts', note:'Sizes needed. Lead time ~2–3 weeks.', owner:'Allie', pills:['financial'] },
+  { week:'w2', track:'admin', label:'Order custom hats', note:'Trucker / bucket / visor?', owner:'Allie', pills:[] },
+  { week:'w2', track:'admin', label:'Order tote bags', note:'For swag distribution + boat day', owner:'Allie', pills:[] },
+  { week:'w2', track:'admin', label:'Order extras (koozies, stickers, lip gloss, etc.)', note:'Small touches for the bag', owner:'Allie', pills:[] },
+  // ===== W6 =====
+  { week:'w6', track:'admin', label:'Pack swag bags', note:'One per guest, ready to hand out at check-in', owner:'Allie', pills:[] },
+  // ===== W9 =====
+  { week:'w9', track:'admin', label:'Distribute swag bags at Friday check-in', note:'', owner:'Allie', pills:[] },
+  // ===== W3 =====
+  { week:'w3', track:'wi', label:'Build Spotify playlist for boat day', note:'Crowdsource adds from guests', owner:'Both', pills:[] },
+  // ===== W4 =====
+  { week:'w4', track:'logistics', label:'Assign boat day supplies', note:'Drinks, towels, speaker — due 6/17', owner:'Allie', pills:[] },
+  // ===== W5 =====
+  { week:'w5', track:'rentback', label:'Plan brunch spot or groceries', note:'Dine out vs cook — due 6/22', owner:'Allie', pills:[] },
+  { week:'w5', track:'logistics', label:'Assign beach day supplies', note:'Chairs, umbrellas — due 6/25', owner:'Allie', pills:[] },
+  // ===== W6 =====
+  { week:'w6', track:'admin', label:'Print out photos', note:'For decor + memory book — due 6/30', owner:'Allie', pills:[] },
+  { week:'w6', track:'admin', label:'Print itinerary cards for the house', note:'One per guest + a big one for the fridge', owner:'Allie', pills:[] },
+  // ===== W7 =====
+  { week:'w7', track:'logistics', label:'Confirm transportation plan', note:'Carpools, buses, Ubers, DDs — due 7/7', owner:'Allie', pills:[] },
+  { week:'w7', track:'wi', label:'Reconfirm any reservations', note:'Weather + arrival time — due 7/10', owner:'Allie', pills:[] },
+  { week:'w7', track:'logistics', label:'Coordinate group chat / share contacts', note:'iMessage or Whatsapp + addresses', owner:'Allie', pills:[] },
+  { week:'w7', track:'logistics', label:'Build a rainy-day backup plan', note:'Boat day fallback, lighthouse alt', owner:'Both', pills:[] },
+  // ===== W8 =====
+  { week:'w8', track:'family', label:'Send final itinerary to group', note:'Addresses, reminders, what to wear — due 7/14', owner:'Allie', pills:['urgent'] },
+  { week:'w8', track:'rentback', label:'Assign grocery run', note:'Alcohol + food — due 7/18', owner:'Katie & Annie', pills:[] },
+  { week:'w8', track:'rentback', label:'Buy non-perishable supplies', note:'Cups, straws, napkins — due 7/18', owner:'Both', pills:[] },
+  { week:'w8', track:'logistics', label:'Confirm headcount with restaurants / boat', note:'48 hours out', owner:'Allie', pills:[] },
+  { week:'w8', track:'logistics', label:'Designate photographer / phone for the weekend', note:'Or share an album link with everyone', owner:'Allie', pills:[] },
+  { week:'w8', track:'rentback', label:'Pack hangover / boat day kit', note:'Advil, electrolytes, sunscreen, anti-nausea', owner:'Allie', pills:[] },
+  // ===== W9 =====
+  { week:'w9', track:'logistics', label:'Check on early check-in with Airbnb', note:'Day before — due 7/23', owner:'Allie', pills:[] },
+  { week:'w9', track:'logistics', label:'Bring cash for tips', note:'Boat captain, magician — due 7/24', owner:'Allie', pills:['urgent'] },
+  { week:'w9', track:'logistics', label:'Confirm arrival times + DDs', note:'', owner:'Allie', pills:[] },
+  { week:'w9', track:'wi', label:'Friday: Wineries + lunch + town (12–4 PM)', note:'Annie picks wineries', pills:[] },
+  { week:'w9', track:'logistics', label:'Friday: Check-in + get ready (4–6 PM)', note:'', pills:[] },
+  { week:'w9', track:'wi', label:'Friday: Sunset at the lighthouse (6–7 PM)', note:'Group photo time', pills:[] },
+  { week:'w9', track:'rentback', label:'Friday: Dinner out (7:30–9 PM)', note:'Annie picks restaurant', pills:[] },
+  { week:'w9', track:'admin', label:'Friday: Matching sets + games + girlie things', note:'Back at the house', pills:[] },
+  { week:'w9', track:'rentback', label:'Saturday: Breakfast at home (8–9 AM)', note:'', pills:[] },
+  { week:'w9', track:'wi', label:'Saturday: In-house yoga (9–10 AM)', note:'', pills:[] },
+  { week:'w9', track:'wi', label:'Saturday: Boat day (12–4 PM)', note:'The main event', pills:[] },
+  { week:'w9', track:'wi', label:'Saturday: Magician (6:30–7:30 PM)', note:'Contract booked', pills:[] },
+  { week:'w9', track:'rentback', label:'Saturday: Dinner (8–10 PM)', note:'Maybe chef after magician?', pills:[] },
+  { week:'w9', track:'wi', label:'Saturday: Go out (10 PM on)', note:'Phoenix Bar & Grill for dancing?', pills:[] },
+  { week:'w9', track:'logistics', label:'Sunday: Pack up + check out (9–10:30 AM)', note:'', pills:[] },
+  { week:'w9', track:'wi', label:'Sunday: Shopping + farmers market + group hug', note:'10:30 AM – 1 PM', pills:[] },
+  { week:'w9', track:'logistics', label:'Sunday: Airbnb cleaning checklist', note:'Trash out, dishes, restage', owner:'Allie', pills:[] },
+  { week:'w9', track:'money', label:'Add to Splitwise + true up costs', note:'7/31', owner:'Allie', pills:[] },
+  { week:'w9', track:'admin', label:'Share photo album with everyone', note:'', owner:'Allie', pills:[] },
 ];
 
 // ============================================================
@@ -2081,7 +2123,7 @@ function renderItinerary() {
 // ============================================================
 // STATE
 // ============================================================
-const STORAGE_KEY = 'annie-bach-workplan-v1';
+const STORAGE_KEY = 'annie-bach-workplan-v2';
 
 function uid() { return 't_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7); }
 
