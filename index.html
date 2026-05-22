@@ -1313,6 +1313,149 @@
     border-radius: 8px;
     box-shadow: var(--shadow);
   }
+  /* ============ GUEST CARDS ============ */
+  .guests-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 14px;
+    padding: 16px;
+  }
+  .guest-card {
+    background: var(--bg-card);
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+    display: flex; flex-direction: column; gap: 8px;
+    position: relative;
+  }
+  .guest-card.rsvp-confirmed { border-left: 4px solid var(--forest); }
+  .guest-card.rsvp-tbd { border-left: 4px solid var(--clay); }
+  .guest-card.rsvp-declined { border-left: 4px solid var(--ink-faint); opacity: 0.6; }
+  .gc-header { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+  .gc-name { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; }
+  .gc-name .gc-bride { font-style: italic; color: var(--clay); font-size: 13px; margin-left: 6px; }
+  .gc-rsvp {
+    font-size: 9.5px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 3px 9px; border-radius: 100px;
+  }
+  .gc-rsvp.rsvp-confirmed { background: rgba(74,142,149,0.14); color: var(--forest); }
+  .gc-rsvp.rsvp-tbd { background: rgba(122,160,194,0.16); color: var(--clay); }
+  .gc-rsvp.rsvp-declined { background: rgba(133,151,168,0.16); color: var(--ink-faint); }
+  .gc-days { display: flex; gap: 4px; flex-wrap: wrap; }
+  .gc-day {
+    font-size: 10.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 3px 9px; border-radius: 4px;
+    background: rgba(122,160,194,0.10); color: var(--ink-faint); border: 1px solid var(--rule-soft);
+  }
+  .gc-day.is-yes { background: rgba(74,142,149,0.14); color: var(--forest); border-color: var(--forest); }
+  .gc-day.is-no { background: transparent; color: var(--ink-faint); opacity: 0.5; }
+  .gc-row { display: flex; gap: 12px; font-size: 12.5px; line-height: 1.45; flex-wrap: wrap; }
+  .gc-row .gc-key { color: var(--ink-faint); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; min-width: 56px; flex-shrink: 0; padding-top: 2px; }
+  .gc-row .gc-val { color: var(--ink); flex: 1; min-width: 0; word-wrap: break-word; }
+  .gc-row .gc-val[contenteditable]:empty::before {
+    content: attr(data-placeholder); color: var(--ink-faint); font-style: italic;
+  }
+  .gc-row .gc-val[contenteditable]:focus { outline: 1px solid var(--clay); outline-offset: 2px; border-radius: 3px; }
+  .gc-divider { height: 1px; background: var(--rule-soft); margin: 4px 0; }
+  .gc-del {
+    position: absolute; top: 12px; right: 12px;
+    background: transparent; border: none; color: var(--ink-faint);
+    font-size: 18px; cursor: pointer; padding: 2px 6px; line-height: 1;
+    opacity: 0; transition: opacity 0.15s;
+  }
+  .guest-card:hover .gc-del { opacity: 1; }
+  .gc-del:hover { color: var(--behind); }
+  @media (max-width: 600px) {
+    .guests-grid { grid-template-columns: 1fr; padding: 10px; gap: 10px; }
+    .guest-card { padding: 14px; }
+    .gc-name { font-size: 17px; }
+  }
+
+  /* ============ GROCERY ============ */
+  .gro-category {
+    background: var(--bg-card);
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    margin: 14px 16px;
+    overflow: hidden;
+  }
+  .gro-cat-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--rule);
+    background: linear-gradient(180deg, rgba(122,160,194,0.06), transparent);
+  }
+  .gro-cat-name {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 17px;
+    color: var(--ink); flex: 1;
+  }
+  .gro-cat-count {
+    font-size: 11px; color: var(--ink-faint);
+    background: rgba(122,160,194,0.12); padding: 2px 8px; border-radius: 100px;
+  }
+  .gro-line {
+    display: grid;
+    grid-template-columns: 28px 1fr 100px 1fr 30px;
+    gap: 12px;
+    padding: 8px 18px;
+    border-top: 1px solid var(--rule-soft);
+    align-items: center;
+  }
+  .gro-line:first-of-type { border-top: none; }
+  .gro-line:hover { background: rgba(122,160,194,0.04); }
+  .gro-line.is-got { opacity: 0.55; }
+  .gro-line.is-got .gro-item { text-decoration: line-through; }
+  .gro-check { width: 20px; height: 20px; accent-color: var(--forest); cursor: pointer; }
+  .gro-input {
+    border: 1px solid transparent;
+    background: transparent;
+    padding: 5px 8px;
+    border-radius: 6px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 13px;
+    color: var(--ink);
+    width: 100%;
+    outline: none;
+  }
+  .gro-input:hover { border-color: var(--rule-soft); }
+  .gro-input:focus { border-color: var(--clay); background: white; }
+  .gro-qty { font-variant-numeric: tabular-nums; text-align: center; }
+  .gro-del {
+    background: transparent; border: none; cursor: pointer;
+    font-size: 16px; color: var(--ink-faint);
+    padding: 4px 8px; border-radius: 4px;
+    opacity: 0;
+  }
+  .gro-line:hover .gro-del { opacity: 1; }
+  .gro-del:hover { color: var(--behind); }
+  .gro-add {
+    width: 100%; text-align: left;
+    padding: 10px 18px;
+    background: transparent;
+    border: none; border-top: 1px dashed var(--rule-soft);
+    color: var(--ink-faint);
+    font-family: 'Manrope', sans-serif;
+    font-size: 12.5px;
+    cursor: pointer;
+  }
+  .gro-add:hover { color: var(--clay); background: rgba(122,160,194,0.06); }
+  .gro-cols {
+    display: grid;
+    grid-template-columns: 28px 1fr 100px 1fr 30px;
+    gap: 12px;
+    padding: 8px 18px 4px;
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ink-faint); font-weight: 600;
+  }
+  @media (max-width: 600px) {
+    .gro-category { margin: 10px 12px; }
+    .gro-cat-header { padding: 10px 14px; }
+    .gro-line, .gro-cols { grid-template-columns: 24px 1fr 60px 1fr 26px; gap: 6px; padding-left: 12px; padding-right: 12px; }
+    .gro-input { font-size: 12px; padding: 4px 6px; }
+    .gro-check { width: 18px; height: 18px; }
+  }
+
   .data-table { width: 100%; border-collapse: collapse; }
   .data-table th, .data-table td {
     padding: 10px 12px; text-align: left;
@@ -1534,6 +1677,7 @@
     <button class="tab-btn active" data-tab="weeks">Week-by-week</button>
     <button class="tab-btn" data-tab="list">Task list</button>
     <button class="tab-btn" data-tab="guests">Guests</button>
+    <button class="tab-btn" data-tab="grocery">Grocery</button>
     <button class="tab-btn" data-tab="ideas">Ideas</button>
     <button class="tab-btn" data-tab="itinerary">Itinerary</button>
   </div>
@@ -1664,19 +1808,19 @@
       <div class="data-meta" id="guests-meta"></div>
       <button class="data-add-btn" onclick="addGuestRow()">+ Add guest</button>
     </div>
-    <div class="data-table-wrap">
-      <table class="data-table" id="guests-table">
-        <thead><tr>
-          <th class="dt-num">#</th>
-          <th>First</th><th>Last</th><th>Phone</th>
-          <th>RSVP</th><th>Fri</th><th>Sat</th><th>Sun</th>
-          <th>Shirt</th><th>Dietary</th><th>Snacks</th><th>Drinks</th>
-          <th>Venmo</th><th>Room</th><th>Notes</th>
-          <th class="dt-actions"></th>
-        </tr></thead>
-        <tbody id="guests-tbody"></tbody>
-      </table>
+    <div class="guests-grid" id="guests-grid"></div>
+  </div>
+</div>
+
+<!-- ============ GROCERY TAB ============ -->
+<div class="tab-content" id="tab-grocery">
+  <div class="data-shell">
+    <div class="data-toolbar">
+      <h2 class="data-title">Grocery list</h2>
+      <div class="data-meta" id="grocery-meta"></div>
+      <button class="data-add-btn" onclick="addGroceryRow()">+ Add item</button>
     </div>
+    <div id="grocery-categories"></div>
   </div>
 </div>
 
@@ -1939,46 +2083,76 @@ function attachCellHandlers(row, item, onChange) {
 // ----- GUESTS -----
 function renderGuests() {
   ensureGuestsState();
-  const tbody = document.getElementById('guests-tbody');
-  tbody.innerHTML = '';
-  state.guests.forEach((g, idx) => {
-    const tr = document.createElement('tr');
-    tr.dataset.id = g.id;
-    const rsvpClass = g.rsvp === 'Confirmed' ? 'rsvp-confirmed' : g.rsvp === 'TBD' ? 'rsvp-tbd' : g.rsvp === 'Declined' ? 'rsvp-declined' : '';
-    tr.innerHTML = `
-      <td class="dt-num">${idx + 1}</td>
-      <td>${dataCellHTML(g.first, 'first', 'First')}</td>
-      <td>${dataCellHTML(g.last, 'last', 'Last')}</td>
-      <td>${dataCellHTML(g.phone, 'phone', '555…')}</td>
-      <td><span class="data-cell ${rsvpClass}" contenteditable="true" data-field="rsvp" data-placeholder="—">${escapeHTML(g.rsvp||'')}</span></td>
-      <td>${dataCellHTML(g.friday, 'friday', '—')}</td>
-      <td>${dataCellHTML(g.saturday, 'saturday', '—')}</td>
-      <td>${dataCellHTML(g.sunday, 'sunday', '—')}</td>
-      <td>${dataCellHTML(g.sweatshirt, 'sweatshirt', 'S/M/L')}</td>
-      <td>${dataCellHTML(g.dietary, 'dietary', '—')}</td>
-      <td>${dataCellHTML(g.snacks, 'snacks', '—')}</td>
-      <td>${dataCellHTML(g.drinks, 'drinks', '—')}</td>
-      <td>${dataCellHTML(g.venmo, 'venmo', '@…')}</td>
-      <td>${dataCellHTML(g.room, 'room', '—')}</td>
-      <td>${dataCellHTML(g.comment, 'comment', '—')}</td>
-      <td class="dt-actions"><button class="data-del-btn" title="Delete">×</button></td>
+  const grid = document.getElementById('guests-grid');
+  grid.innerHTML = '';
+  state.guests.forEach((g) => {
+    const card = document.createElement('div');
+    const rsvpRaw = (g.rsvp || '').toLowerCase();
+    const rsvpClass = rsvpRaw === 'confirmed' ? 'rsvp-confirmed' : rsvpRaw === 'tbd' ? 'rsvp-tbd' : rsvpRaw === 'declined' ? 'rsvp-declined' : '';
+    card.className = 'guest-card ' + rsvpClass;
+    card.dataset.id = g.id;
+    const lastTxt = escapeHTML(g.last || '');
+    const isBride = /bride/i.test(g.last || '');
+    const lastClean = isBride ? lastTxt.replace(/\s*\(.*?\)\s*/g, '') : lastTxt;
+    const dayHTML = (v, name) => {
+      const yes = (v||'').toLowerCase().startsWith('y');
+      const no = (v||'').toLowerCase().startsWith('n');
+      const cls = yes ? 'is-yes' : no ? 'is-no' : '';
+      return `<span class="gc-day ${cls}" data-day="${name}">${name.toUpperCase()}</span>`;
+    };
+    card.innerHTML = `
+      <button class="gc-del" title="Remove">×</button>
+      <div class="gc-header">
+        <div class="gc-name">
+          <span class="gc-val" contenteditable="true" data-field="first" data-placeholder="First">${escapeHTML(g.first||'')}</span>
+          <span class="gc-val" contenteditable="true" data-field="last" data-placeholder="Last">${lastClean}</span>
+          ${isBride ? '<span class="gc-bride">bride</span>' : ''}
+        </div>
+        <span class="gc-rsvp ${rsvpClass}" contenteditable="true" data-field="rsvp" data-placeholder="TBD">${escapeHTML(g.rsvp||'')}</span>
+      </div>
+      <div class="gc-days">${dayHTML(g.friday,'Fri')}${dayHTML(g.saturday,'Sat')}${dayHTML(g.sunday,'Sun')}</div>
+      <div class="gc-divider"></div>
+      <div class="gc-row"><span class="gc-key">Phone</span><span class="gc-val" contenteditable="true" data-field="phone" data-placeholder="—">${escapeHTML(g.phone||'')}</span></div>
+      <div class="gc-row"><span class="gc-key">Shirt</span><span class="gc-val" contenteditable="true" data-field="sweatshirt" data-placeholder="S / M / L">${escapeHTML(g.sweatshirt||'')}</span></div>
+      <div class="gc-row"><span class="gc-key">Dietary</span><span class="gc-val" contenteditable="true" data-field="dietary" data-placeholder="—">${escapeHTML(g.dietary||'')}</span></div>
+      <div class="gc-row"><span class="gc-key">Snacks</span><span class="gc-val" contenteditable="true" data-field="snacks" data-placeholder="—">${escapeHTML(g.snacks||'')}</span></div>
+      <div class="gc-row"><span class="gc-key">Drinks</span><span class="gc-val" contenteditable="true" data-field="drinks" data-placeholder="—">${escapeHTML(g.drinks||'')}</span></div>
+      <div class="gc-row"><span class="gc-key">Venmo</span><span class="gc-val" contenteditable="true" data-field="venmo" data-placeholder="@…">${escapeHTML(g.venmo||'')}</span></div>
+      <div class="gc-row"><span class="gc-key">Room</span><span class="gc-val" contenteditable="true" data-field="room" data-placeholder="—">${escapeHTML(g.room||'')}</span></div>
+      <div class="gc-row"><span class="gc-key">Notes</span><span class="gc-val" contenteditable="true" data-field="comment" data-placeholder="—">${escapeHTML(g.comment||'')}</span></div>
     `;
-    attachCellHandlers(tr, g, () => {
-      const rsvpEl = tr.querySelector('[data-field="rsvp"]');
-      rsvpEl.classList.remove('rsvp-confirmed','rsvp-tbd','rsvp-declined');
-      const v = (g.rsvp || '').toLowerCase();
-      if (v === 'confirmed') rsvpEl.classList.add('rsvp-confirmed');
-      else if (v === 'tbd') rsvpEl.classList.add('rsvp-tbd');
-      else if (v === 'declined') rsvpEl.classList.add('rsvp-declined');
-      updateGuestsMeta();
+    // Day toggles
+    card.querySelectorAll('.gc-day').forEach(d => {
+      d.addEventListener('click', () => {
+        const field = { Fri:'friday', Sat:'saturday', Sun:'sunday' }[d.dataset.day];
+        const cur = (g[field] || '').toLowerCase();
+        g[field] = cur === 'yes' ? 'No' : 'Yes';
+        persist();
+        renderGuests();
+      });
     });
-    tr.querySelector('.data-del-btn').addEventListener('click', () => {
+    // Editable fields
+    card.querySelectorAll('[contenteditable="true"]').forEach(el => {
+      el.addEventListener('blur', () => {
+        const field = el.dataset.field;
+        const newVal = el.textContent.trim();
+        if (newVal !== (g[field] || '')) {
+          g[field] = newVal;
+          persist();
+          if (field === 'rsvp') renderGuests();
+        }
+      });
+      el.addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); el.blur(); }
+      });
+    });
+    card.querySelector('.gc-del').addEventListener('click', () => {
       if (!confirm('Remove this guest?')) return;
       state.guests = state.guests.filter(x => x.id !== g.id);
       persist();
       renderGuests();
     });
-    tbody.appendChild(tr);
+    grid.appendChild(card);
   });
   updateGuestsMeta();
 }
@@ -3147,8 +3321,162 @@ function renderActive() {
   if (active === 'weeks') renderWeeks();
   else if (active === 'list') renderList();
   else if (active === 'guests') renderGuests();
+  else if (active === 'grocery') renderGrocery();
   else if (active === 'ideas') renderIdeas();
   else if (active === 'itinerary') renderItinerary();
+}
+
+// ============================================================
+// GROCERY LIST
+// ============================================================
+const GROCERY_CATEGORIES = [
+  'Drinks — Alcohol', 'Drinks — Non-alcohol', 'Snacks', 'Breakfast',
+  'Boat day', 'Pantry / supplies', 'Decor / extras'
+];
+
+const SEED_GROCERY = [
+  // Drinks - Alc (drawing from guest preferences)
+  { category: 'Drinks — Alcohol', item: 'Red wine (variety)',                 qty: '4 bottles', note: 'Annie G + Allison + bridal toast' },
+  { category: 'Drinks — Alcohol', item: 'White / rosé wine',                  qty: '4 bottles', note: '' },
+  { category: 'Drinks — Alcohol', item: 'High Noon variety pack',             qty: '24-pack',   note: 'Lindsay + boat day' },
+  { category: 'Drinks — Alcohol', item: 'Tequila + mixers for sig cocktail',  qty: '1 bottle',  note: 'Boat day signature cocktail' },
+  { category: 'Drinks — Alcohol', item: 'Champagne / prosecco for toast',     qty: '2 bottles', note: '' },
+  // Drinks - NA
+  { category: 'Drinks — Non-alcohol', item: 'NA Athletic beer',               qty: '12-pack',   note: 'Allie + Lindsay' },
+  { category: 'Drinks — Non-alcohol', item: 'Bubbly / sparkling water',       qty: '2 cases',   note: 'Kris + Maddie' },
+  { category: 'Drinks — Non-alcohol', item: 'Lemonade or other NA mixers',    qty: '2 jugs',    note: 'Katie' },
+  { category: 'Drinks — Non-alcohol', item: 'Coffee + filters',               qty: '1 bag',     note: 'Mornings' },
+  { category: 'Drinks — Non-alcohol', item: 'Half & half + creamer',          qty: '1 pint',    note: '' },
+  // Snacks (matching guest requests)
+  { category: 'Snacks', item: 'Popcorn',                                       qty: '2 bags',    note: 'Allie + Lindsay' },
+  { category: 'Snacks', item: 'Gummies / sour candy',                          qty: '1 bag',     note: 'Allie' },
+  { category: 'Snacks', item: 'Chips + salsa',                                 qty: '2 bags',    note: 'Annie G + Coley' },
+  { category: 'Snacks', item: 'Cheese + crackers + meat board',                qty: 'platter',   note: 'Lindsay' },
+  { category: 'Snacks', item: 'Pretzels',                                      qty: '1 bag',     note: 'Lindsay + Coley' },
+  { category: 'Snacks', item: 'Extra Toasty Cheez-Its',                        qty: '1 box',     note: 'Allison' },
+  { category: 'Snacks', item: 'Regular Cheez-Its',                             qty: '1 box',     note: 'Maddie' },
+  { category: 'Snacks', item: 'Fruit (berries, grapes, oranges)',              qty: '',          note: 'Kris + Coley' },
+  { category: 'Snacks', item: 'GF / DF snack option',                          qty: '',          note: 'For Coley (GF) + Katie brings her own + Annie G allergies' },
+  // Breakfast
+  { category: 'Breakfast', item: 'Bagels + cream cheese',                      qty: '12',        note: 'Kris' },
+  { category: 'Breakfast', item: 'Eggs',                                       qty: '2 dozen',   note: '' },
+  { category: 'Breakfast', item: 'Bacon or sausage',                           qty: '2 lbs',     note: '' },
+  { category: 'Breakfast', item: 'Fruit platter',                              qty: '',          note: '' },
+  { category: 'Breakfast', item: 'Yogurt / granola',                           qty: '',          note: '' },
+  { category: 'Breakfast', item: 'GF bread / muffins',                         qty: '',          note: 'For Coley + Katie' },
+  // Boat day
+  { category: 'Boat day', item: 'Cooler ice',                                  qty: '2 bags',    note: '' },
+  { category: 'Boat day', item: 'Sandwiches / wraps for boat lunch',           qty: '12',        note: 'Mix GF + regular' },
+  { category: 'Boat day', item: 'Cut fruit container',                         qty: '',          note: 'Easy boat snack' },
+  { category: 'Boat day', item: 'Pretzel sticks / individual chip bags',       qty: '',          note: 'Boat-friendly snacks' },
+  { category: 'Boat day', item: 'Sunscreen (SPF 30 + 50)',                     qty: '2 bottles', note: '' },
+  { category: 'Boat day', item: 'Aloe',                                        qty: '1 bottle',  note: 'For after' },
+  // Pantry / supplies
+  { category: 'Pantry / supplies', item: 'Solo cups',                          qty: '50',        note: '' },
+  { category: 'Pantry / supplies', item: 'Reusable / acrylic wine glasses',    qty: '12',        note: 'For boat' },
+  { category: 'Pantry / supplies', item: 'Paper plates',                       qty: '50',        note: '' },
+  { category: 'Pantry / supplies', item: 'Napkins',                            qty: '2 packs',   note: '' },
+  { category: 'Pantry / supplies', item: 'Straws',                             qty: '1 pack',    note: '' },
+  { category: 'Pantry / supplies', item: 'Plastic utensils',                   qty: '1 pack',    note: '' },
+  { category: 'Pantry / supplies', item: 'Trash bags',                         qty: '1 box',     note: '' },
+  { category: 'Pantry / supplies', item: 'Paper towels',                       qty: '2 rolls',   note: '' },
+  { category: 'Pantry / supplies', item: 'Ziploc bags',                        qty: '1 box',     note: '' },
+  // Hangover / care
+  { category: 'Pantry / supplies', item: 'Advil / Tylenol',                    qty: '1 bottle',  note: 'Hangover kit' },
+  { category: 'Pantry / supplies', item: 'Electrolyte packets (Liquid IV)',    qty: '1 box',     note: 'Hangover kit' },
+  { category: 'Pantry / supplies', item: 'Anti-nausea (Dramamine for boat)',   qty: '1 pack',    note: '' },
+  { category: 'Pantry / supplies', item: 'Tums',                               qty: '1 pack',    note: '' },
+  // Decor
+  { category: 'Decor / extras', item: 'Balloons',                              qty: '',          note: '' },
+  { category: 'Decor / extras', item: 'Banner / signs',                        qty: '',          note: '' },
+  { category: 'Decor / extras', item: 'Tea lights / candles',                  qty: '',          note: '' },
+  { category: 'Decor / extras', item: 'Bride sash',                            qty: '1',         note: 'For Annie' },
+  { category: 'Decor / extras', item: 'Disposable cameras',                    qty: '4',         note: 'Optional fun add' }
+];
+
+function ensureGroceryState() {
+  if (!state.grocery || !Array.isArray(state.grocery.items)) {
+    state.grocery = { items: SEED_GROCERY.map(g => ({ id: uid(), got: false, ...g })) };
+  }
+}
+
+function renderGrocery() {
+  ensureGroceryState();
+  const c = document.getElementById('grocery-categories');
+  c.innerHTML = '';
+  const items = state.grocery.items;
+  const allCats = [...new Set([...GROCERY_CATEGORIES, ...items.map(i => i.category)])];
+  allCats.forEach(cat => {
+    const list = items.filter(i => i.category === cat);
+    const got = list.filter(i => i.got).length;
+    const sec = document.createElement('div');
+    sec.className = 'gro-category';
+    sec.innerHTML = `
+      <div class="gro-cat-header">
+        <div class="gro-cat-name">${escapeHTML(cat)}</div>
+        <div class="gro-cat-count">${got} / ${list.length}</div>
+      </div>
+      <div class="gro-cols"><div></div><div>Item</div><div>Qty</div><div>Note</div><div></div></div>
+      <div class="gro-lines"></div>
+      <button class="gro-add" data-cat="${escapeHTML(cat)}">+ Add item</button>
+    `;
+    const lines = sec.querySelector('.gro-lines');
+    list.forEach(item => lines.appendChild(renderGroLine(item)));
+    sec.querySelector('.gro-add').addEventListener('click', () => {
+      const newItem = { id: uid(), category: cat, item: '', qty: '', note: '', got: false };
+      state.grocery.items.push(newItem);
+      persist();
+      renderGrocery();
+      setTimeout(() => {
+        const el = document.querySelector(`.gro-line[data-id="${newItem.id}"] .gro-input.item`);
+        if (el) el.focus();
+      }, 0);
+    });
+    c.appendChild(sec);
+  });
+  updateGroceryMeta();
+}
+
+function renderGroLine(item) {
+  const row = document.createElement('div');
+  row.className = 'gro-line' + (item.got ? ' is-got' : '');
+  row.dataset.id = item.id;
+  row.innerHTML = `
+    <input type="checkbox" class="gro-check" ${item.got ? 'checked' : ''}>
+    <input type="text" class="gro-input item" placeholder="Item name" value="${escapeHTML(item.item || '')}">
+    <input type="text" class="gro-input gro-qty" placeholder="—" value="${escapeHTML(item.qty || '')}">
+    <input type="text" class="gro-input note" placeholder="—" value="${escapeHTML(item.note || '')}">
+    <button class="gro-del" title="Delete">×</button>
+  `;
+  row.querySelector('.gro-check').addEventListener('change', e => {
+    item.got = e.target.checked;
+    persist();
+    renderGrocery();
+  });
+  row.querySelector('.item').addEventListener('change', e => { item.item = e.target.value.trim(); persist(); });
+  row.querySelector('.gro-qty').addEventListener('change', e => { item.qty = e.target.value.trim(); persist(); });
+  row.querySelector('.note').addEventListener('change', e => { item.note = e.target.value.trim(); persist(); });
+  row.querySelector('.gro-del').addEventListener('click', () => {
+    if (!confirm('Delete this item?')) return;
+    state.grocery.items = state.grocery.items.filter(i => i.id !== item.id);
+    persist();
+    renderGrocery();
+  });
+  return row;
+}
+
+function updateGroceryMeta() {
+  const total = state.grocery.items.length;
+  const got = state.grocery.items.filter(i => i.got).length;
+  const el = document.getElementById('grocery-meta');
+  if (el) el.textContent = `${got} of ${total} items got`;
+}
+
+function addGroceryRow() {
+  ensureGroceryState();
+  state.grocery.items.push({ id: uid(), category: GROCERY_CATEGORIES[0], item: '', qty: '', note: '', got: false });
+  persist();
+  renderGrocery();
 }
 
 let weekFilters = { empty: false, past: false, done: false };
