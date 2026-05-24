@@ -1316,18 +1316,37 @@
   /* ============ GUEST CARDS ============ */
   .guests-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 14px;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 10px;
     padding: 16px;
   }
   .guest-card {
     background: var(--bg-card);
     border: 1px solid var(--rule);
-    border-radius: 12px;
-    padding: 16px 18px;
+    border-radius: 10px;
+    padding: 10px 14px;
     box-shadow: var(--shadow);
-    display: flex; flex-direction: column; gap: 8px;
+    display: flex; flex-direction: column; gap: 6px;
     position: relative;
+    cursor: pointer;
+    transition: box-shadow 0.15s, border-color 0.15s;
+  }
+  .guest-card:hover { border-color: var(--clay-soft); }
+  .guest-card.is-expanded {
+    cursor: default;
+    grid-column: span 2;
+    box-shadow: 0 4px 16px -4px rgba(30,45,60,0.18);
+    border-color: var(--clay);
+  }
+  .guest-card .gc-details { display: none; flex-direction: column; gap: 8px; }
+  .guest-card.is-expanded .gc-details { display: flex; }
+  .guest-card .gc-expand-hint {
+    font-size: 9.5px; color: var(--ink-faint); font-style: italic;
+    text-align: right; margin-top: 2px;
+  }
+  .guest-card.is-expanded .gc-expand-hint { display: none; }
+  @media (max-width: 600px) {
+    .guest-card.is-expanded { grid-column: span 1; }
   }
   .guest-card.rsvp-confirmed { border-left: 4px solid var(--forest); }
   .guest-card.rsvp-tbd { border-left: 4px solid var(--clay); }
@@ -2111,16 +2130,26 @@ function renderGuests() {
         <span class="gc-rsvp ${rsvpClass}" contenteditable="true" data-field="rsvp" data-placeholder="TBD">${escapeHTML(g.rsvp||'')}</span>
       </div>
       <div class="gc-days">${dayHTML(g.friday,'Fri')}${dayHTML(g.saturday,'Sat')}${dayHTML(g.sunday,'Sun')}</div>
-      <div class="gc-divider"></div>
-      <div class="gc-row"><span class="gc-key">Phone</span><span class="gc-val" contenteditable="true" data-field="phone" data-placeholder="—">${escapeHTML(g.phone||'')}</span></div>
-      <div class="gc-row"><span class="gc-key">Shirt</span><span class="gc-val" contenteditable="true" data-field="sweatshirt" data-placeholder="S / M / L">${escapeHTML(g.sweatshirt||'')}</span></div>
-      <div class="gc-row"><span class="gc-key">Dietary</span><span class="gc-val" contenteditable="true" data-field="dietary" data-placeholder="—">${escapeHTML(g.dietary||'')}</span></div>
-      <div class="gc-row"><span class="gc-key">Snacks</span><span class="gc-val" contenteditable="true" data-field="snacks" data-placeholder="—">${escapeHTML(g.snacks||'')}</span></div>
-      <div class="gc-row"><span class="gc-key">Drinks</span><span class="gc-val" contenteditable="true" data-field="drinks" data-placeholder="—">${escapeHTML(g.drinks||'')}</span></div>
-      <div class="gc-row"><span class="gc-key">Venmo</span><span class="gc-val" contenteditable="true" data-field="venmo" data-placeholder="@…">${escapeHTML(g.venmo||'')}</span></div>
-      <div class="gc-row"><span class="gc-key">Room</span><span class="gc-val" contenteditable="true" data-field="room" data-placeholder="—">${escapeHTML(g.room||'')}</span></div>
-      <div class="gc-row"><span class="gc-key">Notes</span><span class="gc-val" contenteditable="true" data-field="comment" data-placeholder="—">${escapeHTML(g.comment||'')}</span></div>
+      <div class="gc-expand-hint">click to expand</div>
+      <div class="gc-details">
+        <div class="gc-divider"></div>
+        <div class="gc-row"><span class="gc-key">Phone</span><span class="gc-val" contenteditable="true" data-field="phone" data-placeholder="—">${escapeHTML(g.phone||'')}</span></div>
+        <div class="gc-row"><span class="gc-key">Shirt</span><span class="gc-val" contenteditable="true" data-field="sweatshirt" data-placeholder="S / M / L">${escapeHTML(g.sweatshirt||'')}</span></div>
+        <div class="gc-row"><span class="gc-key">Dietary</span><span class="gc-val" contenteditable="true" data-field="dietary" data-placeholder="—">${escapeHTML(g.dietary||'')}</span></div>
+        <div class="gc-row"><span class="gc-key">Snacks</span><span class="gc-val" contenteditable="true" data-field="snacks" data-placeholder="—">${escapeHTML(g.snacks||'')}</span></div>
+        <div class="gc-row"><span class="gc-key">Drinks</span><span class="gc-val" contenteditable="true" data-field="drinks" data-placeholder="—">${escapeHTML(g.drinks||'')}</span></div>
+        <div class="gc-row"><span class="gc-key">Venmo</span><span class="gc-val" contenteditable="true" data-field="venmo" data-placeholder="@…">${escapeHTML(g.venmo||'')}</span></div>
+        <div class="gc-row"><span class="gc-key">Room</span><span class="gc-val" contenteditable="true" data-field="room" data-placeholder="—">${escapeHTML(g.room||'')}</span></div>
+        <div class="gc-row"><span class="gc-key">Notes</span><span class="gc-val" contenteditable="true" data-field="comment" data-placeholder="—">${escapeHTML(g.comment||'')}</span></div>
+      </div>
     `;
+    // Click anywhere on the card (except editable / button) toggles expansion
+    card.addEventListener('click', (ev) => {
+      if (ev.target.closest('[contenteditable="true"]')) return;
+      if (ev.target.closest('button')) return;
+      if (ev.target.closest('.gc-day')) return;
+      card.classList.toggle('is-expanded');
+    });
     // Day toggles
     card.querySelectorAll('.gc-day').forEach(d => {
       d.addEventListener('click', () => {
