@@ -310,6 +310,39 @@
   .legend-swatch { width: 3px; height: 12px; border-radius: 1px; }
 
   /* ============ TABS ============ */
+  .group-bar {
+    position: sticky; top: 48px; z-index: 55;
+    background: rgba(238,243,246,0.92);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--rule);
+  }
+  .group-bar-inner {
+    max-width: 1240px; margin: 0 auto;
+    padding: 12px 40px 0;
+    display: flex; gap: 6px;
+  }
+  .group-tab {
+    background: transparent;
+    border: none;
+    color: var(--ink-faint);
+    font-family: 'Manrope', sans-serif;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    padding: 10px 22px;
+    border-radius: 100px 100px 0 0;
+    cursor: pointer;
+    transition: color 0.15s, background 0.15s;
+  }
+  .group-tab:hover { color: var(--ink); }
+  .group-tab.active {
+    background: var(--ink);
+    color: var(--bg-card);
+  }
+  @media (max-width: 600px) {
+    .group-bar-inner { padding: 8px 14px 0; gap: 4px; }
+    .group-tab { padding: 8px 14px; font-size: 10px; letter-spacing: 0.1em; }
+  }
+  .tab-btn[data-group]:not(.in-group) { display: none; }
   .tab-bar {
     position: sticky; top: 70px; z-index: 50;
     background: rgba(238,243,246,0.92);
@@ -1786,14 +1819,22 @@
 </div>
 
 <!-- ============ TABS ============ -->
+<div class="group-bar">
+  <div class="group-bar-inner">
+    <button class="group-tab active" data-group="plan">Project Plan</button>
+    <button class="group-tab" data-group="budget">Budget</button>
+    <button class="group-tab" data-group="design">Design</button>
+  </div>
+</div>
 <div class="tab-bar">
   <div class="tab-bar-inner">
-    <button class="tab-btn active" data-tab="weeks">Week-by-week</button>
-    <button class="tab-btn" data-tab="list">Task list</button>
-    <button class="tab-btn" data-tab="guests">Guests</button>
-    <button class="tab-btn" data-tab="grocery">Grocery</button>
-    <button class="tab-btn" data-tab="ideas">Ideas</button>
-    <button class="tab-btn" data-tab="itinerary">Itinerary</button>
+    <button class="tab-btn active" data-tab="weeks" data-group="plan">Week-by-week</button>
+    <button class="tab-btn" data-tab="list" data-group="plan">Task list</button>
+    <button class="tab-btn" data-tab="budget" data-group="budget">Overview</button>
+    <button class="tab-btn" data-tab="guests" data-group="design">Guests</button>
+    <button class="tab-btn" data-tab="grocery" data-group="design">Grocery</button>
+    <button class="tab-btn" data-tab="ideas" data-group="design">Ideas</button>
+    <button class="tab-btn" data-tab="itinerary" data-group="design">Itinerary</button>
   </div>
 </div>
 
@@ -1980,6 +2021,18 @@
       <div class="data-meta" id="itin-meta">Friday Jul 24 → Sunday Jul 26</div>
     </div>
     <div id="itin-days"></div>
+  </div>
+</div>
+
+<!-- ============ BUDGET TAB ============ -->
+<div class="tab-content" id="tab-budget">
+  <div class="data-shell">
+    <div class="data-toolbar">
+      <h2 class="data-title">Budget</h2>
+      <div class="data-meta" id="budget-meta"></div>
+    </div>
+    <div class="budget-summary" id="budget-summary"></div>
+    <div id="budget-categories"></div>
   </div>
 </div>
 
@@ -3548,13 +3601,152 @@ document.addEventListener('keydown', e => {
 // TABS
 // ============================================================
 function renderActive() {
-  const active = document.querySelector('.tab-btn.active').dataset.tab;
+  const activeEl = document.querySelector('.tab-btn.active');
+  if (!activeEl) return;
+  const active = activeEl.dataset.tab;
   if (active === 'weeks') renderWeeks();
   else if (active === 'list') renderList();
+  else if (active === 'budget') renderBudget();
   else if (active === 'guests') renderGuests();
   else if (active === 'grocery') renderGrocery();
   else if (active === 'ideas') renderIdeas();
   else if (active === 'itinerary') renderItinerary();
+}
+
+// ============================================================
+// BUDGET (bach)
+// ============================================================
+const BUDGET_CATEGORIES = ['Lodging', 'Entertainment', 'Food & drink', 'Swag', 'Misc'];
+
+const SEED_BUDGET = [
+  // Lodging
+  { category: 'Lodging', label: 'Airbnb — 767 Phoenix St (2 nights)',          estimated: 4000, actual: 0, paid: false, note: 'Split across attending guests' },
+  { category: 'Lodging', label: 'Cleaning / extra fees',                        estimated: 200,  actual: 0, paid: false, note: '' },
+
+  // Entertainment
+  { category: 'Entertainment', label: 'Magician (Saturday)',                    estimated: 850,  actual: 0, paid: false, note: 'Contract booked for 7/25' },
+  { category: 'Entertainment', label: 'Boat charter (Saturday 12–4)',           estimated: 1200, actual: 0, paid: false, note: 'Pontoon or captained' },
+  { category: 'Entertainment', label: 'In-house yoga teacher (Saturday 9 AM)',  estimated: 250,  actual: 0, paid: false, note: '' },
+  { category: 'Entertainment', label: 'Wineries — Friday tasting flights',     estimated: 250,  actual: 0, paid: false, note: 'Per-person tastings' },
+
+  // Food
+  { category: 'Food & drink', label: 'Friday dinner out',                       estimated: 700,  actual: 0, paid: false, note: 'Annie picks restaurant' },
+  { category: 'Food & drink', label: 'Saturday dinner / chef at house',         estimated: 1200, actual: 0, paid: false, note: 'Chef vs restaurant TBD' },
+  { category: 'Food & drink', label: 'Sunday brunch / farmers market',          estimated: 300,  actual: 0, paid: false, note: '' },
+  { category: 'Food & drink', label: 'Groceries — snacks, breakfast, mixers',  estimated: 400,  actual: 0, paid: false, note: 'See Grocery tab' },
+  { category: 'Food & drink', label: 'Alcohol — wine, sig cocktail, beer',     estimated: 350,  actual: 0, paid: false, note: '' },
+
+  // Swag
+  { category: 'Swag', label: 'Custom sweatshirts (×11)',                        estimated: 550,  actual: 0, paid: false, note: '~$50 each' },
+  { category: 'Swag', label: 'Custom hats',                                     estimated: 220,  actual: 0, paid: false, note: '~$20 each' },
+  { category: 'Swag', label: 'Tote bags',                                       estimated: 110,  actual: 0, paid: false, note: '~$10 each' },
+  { category: 'Swag', label: 'Bride sash + accessories',                        estimated: 50,   actual: 0, paid: false, note: '' },
+  { category: 'Swag', label: 'Extras (koozies, stickers, lip gloss)',           estimated: 150,  actual: 0, paid: false, note: '' },
+  { category: 'Swag', label: 'Decorations (balloons, banners, candles)',        estimated: 100,  actual: 0, paid: false, note: '' },
+  { category: 'Swag', label: 'Photos / disposable cameras',                     estimated: 80,   actual: 0, paid: false, note: '' },
+
+  // Misc
+  { category: 'Misc', label: 'Tip — boat captain',                              estimated: 200,  actual: 0, paid: false, note: 'Cash' },
+  { category: 'Misc', label: 'Tip — magician',                                  estimated: 100,  actual: 0, paid: false, note: 'Cash' },
+  { category: 'Misc', label: 'Hangover / boat kit',                             estimated: 50,   actual: 0, paid: false, note: 'Advil, Liquid IV, Dramamine' },
+  { category: 'Misc', label: 'Transportation (Ubers, gas)',                     estimated: 200,  actual: 0, paid: false, note: '' },
+  { category: 'Misc', label: 'Buffer / surprises',                              estimated: 200,  actual: 0, paid: false, note: '' }
+];
+
+function ensureBudgetState() {
+  if (!state.budget || !Array.isArray(state.budget.items)) {
+    state.budget = { items: SEED_BUDGET.map(b => ({ id: uid(), note: '', ...b })) };
+  }
+}
+
+function fmtMoney(n) {
+  const v = Number(n) || 0;
+  return '$' + v.toLocaleString('en-US', { maximumFractionDigits: 0 });
+}
+function parseMoney(s) {
+  if (typeof s !== 'string') s = String(s || '');
+  const cleaned = s.replace(/[^0-9.\-]/g, '');
+  const n = parseFloat(cleaned);
+  return isNaN(n) ? 0 : n;
+}
+
+function renderBudget() {
+  ensureBudgetState();
+  const items = state.budget.items;
+  const totalEst = items.reduce((s, i) => s + (Number(i.estimated)||0), 0);
+  const totalActual = items.reduce((s, i) => s + (Number(i.actual)||0), 0);
+  const totalPaid = items.filter(i=>i.paid).reduce((s,i)=>s+(Number(i.actual)||Number(i.estimated)||0),0);
+  const delta = totalEst - totalActual;
+  const deltaCls = delta >= 0 ? 'delta-pos' : 'delta-neg';
+  const deltaPrefix = delta >= 0 ? 'under by ' : 'over by ';
+  // Per-attending guest split (11 confirmed, minus bride)
+  const payingGuests = Math.max(1, (state.guests||[]).filter(g => (g.rsvp||'').toLowerCase()==='confirmed' && !/bride/i.test(g.last||'')).length);
+  const perPerson = totalEst / payingGuests;
+
+  document.getElementById('budget-summary').innerHTML = `
+    <div class="budget-sum-cell"><div class="budget-sum-label">Estimated total</div><div class="budget-sum-value">${fmtMoney(totalEst)}</div><div class="budget-sum-sub">${items.length} line items</div></div>
+    <div class="budget-sum-cell"><div class="budget-sum-label">Actual total</div><div class="budget-sum-value">${fmtMoney(totalActual)}</div><div class="budget-sum-sub">${items.filter(i=>Number(i.actual)>0).length} with actuals</div></div>
+    <div class="budget-sum-cell"><div class="budget-sum-label">Per guest split</div><div class="budget-sum-value">${fmtMoney(perPerson)}</div><div class="budget-sum-sub">÷ ${payingGuests} paying guests</div></div>
+    <div class="budget-sum-cell"><div class="budget-sum-label">Est. vs Actual</div><div class="budget-sum-value ${deltaCls}">${deltaPrefix}${fmtMoney(Math.abs(delta))}</div><div class="budget-sum-sub">${totalActual===0?'no actuals yet':'running variance'}</div></div>
+  `;
+  document.getElementById('budget-meta').textContent = `${fmtMoney(totalEst)} total · ${fmtMoney(perPerson)} per guest`;
+
+  const allCats = [...new Set([...BUDGET_CATEGORIES, ...items.map(i=>i.category)])];
+  const c = document.getElementById('budget-categories');
+  c.innerHTML = '';
+  allCats.forEach(cat => {
+    const catItems = items.filter(i=>i.category===cat);
+    const catEst = catItems.reduce((s,i)=>s+(Number(i.estimated)||0),0);
+    const catActual = catItems.reduce((s,i)=>s+(Number(i.actual)||0),0);
+    const section = document.createElement('div');
+    section.className = 'budget-category';
+    section.innerHTML = `
+      <div class="budget-cat-header">
+        <div class="budget-cat-name">${escapeHTML(cat)}</div>
+        <div class="budget-cat-total">${fmtMoney(catEst)}<span class="sep">est</span>${fmtMoney(catActual)}<span class="sep">actual</span></div>
+      </div>
+      <div class="budget-cols"><div>Item</div><div>Estimated</div><div>Actual</div><div>Paid</div><div></div></div>
+      <div class="budget-lines"></div>
+      <button class="budget-add" data-cat="${escapeHTML(cat)}">+ Add line item</button>
+    `;
+    const linesBox = section.querySelector('.budget-lines');
+    catItems.forEach(item => linesBox.appendChild(renderBudgetLine(item)));
+    section.querySelector('.budget-add').addEventListener('click', () => {
+      const newItem = { id: uid(), category: cat, label: '', estimated: 0, actual: 0, paid: false, note: '' };
+      state.budget.items.push(newItem);
+      persist();
+      renderBudget();
+      setTimeout(() => {
+        const el = document.querySelector(`.budget-line[data-id="${newItem.id}"] .budget-input.label`);
+        if (el) el.focus();
+      }, 0);
+    });
+    c.appendChild(section);
+  });
+}
+
+function renderBudgetLine(item) {
+  const row = document.createElement('div');
+  row.className = 'budget-line' + (item.paid ? ' is-paid' : '');
+  row.dataset.id = item.id;
+  row.innerHTML = `
+    <input type="text" class="budget-input label" placeholder="Line item name" value="${escapeHTML(item.label||'')}">
+    <input type="text" class="budget-input amount estimated" placeholder="—" value="${item.estimated ? fmtMoney(item.estimated) : ''}">
+    <input type="text" class="budget-input amount actual" placeholder="—" value="${item.actual ? fmtMoney(item.actual) : ''}">
+    <label class="budget-paid"><input type="checkbox" class="budget-paid-check" ${item.paid ? 'checked' : ''}></label>
+    <button class="budget-del" title="Delete">×</button>
+  `;
+  row.querySelector('.label').addEventListener('change', e => { item.label = e.target.value.trim(); persist(); });
+  row.querySelector('.estimated').addEventListener('change', e => { item.estimated = parseMoney(e.target.value); persist(); renderBudget(); });
+  row.querySelector('.actual').addEventListener('change', e => { item.actual = parseMoney(e.target.value); persist(); renderBudget(); });
+  row.querySelector('.budget-paid-check').addEventListener('change', e => { item.paid = e.target.checked; persist(); renderBudget(); });
+  row.querySelector('.budget-del').addEventListener('click', () => {
+    if (!confirm('Delete this line?')) return;
+    state.budget.items = state.budget.items.filter(i => i.id !== item.id);
+    persist();
+    renderBudget();
+  });
+  return row;
 }
 
 // ============================================================
@@ -3763,7 +3955,34 @@ function jumpToCurrentWeek() {
   }, 80);
 }
 
-// (Budget tab removed)
+function activateGroup(group, preferredTab) {
+  // Mark group active
+  document.querySelectorAll('.group-tab').forEach(g => g.classList.toggle('active', g.dataset.group === group));
+  // Show only sub-tabs in this group
+  const subBtns = document.querySelectorAll('.tab-btn[data-group]');
+  subBtns.forEach(b => {
+    const inGroup = b.dataset.group === group;
+    b.classList.toggle('in-group', inGroup);
+    b.classList.toggle('active', false);
+  });
+  // Pick the active sub-tab
+  const inGroupBtns = [...document.querySelectorAll('.tab-btn.in-group')];
+  let target = preferredTab && inGroupBtns.find(b => b.dataset.tab === preferredTab);
+  if (!target) target = inGroupBtns[0];
+  if (target) {
+    target.classList.add('active');
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    const c = document.getElementById('tab-' + target.dataset.tab);
+    if (c) c.classList.add('active');
+    renderActive();
+  }
+  try { localStorage.setItem('bach-group', group); } catch(e) {}
+}
+
+document.querySelectorAll('.group-tab').forEach(gt => {
+  gt.addEventListener('click', () => activateGroup(gt.dataset.group));
+});
+
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -3773,6 +3992,13 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     renderActive();
   });
 });
+
+// Initialize group on load
+(function initGroups(){
+  let g = 'plan';
+  try { g = localStorage.getItem('bach-group') || 'plan'; } catch(e) {}
+  activateGroup(g);
+})();
 
 // ============================================================
 // LIST CONTROLS
