@@ -1313,7 +1313,102 @@
     border-radius: 8px;
     box-shadow: var(--shadow);
   }
-  /* ============ GUEST CARDS ============ */
+  /* ============ GUESTS TABLE ============ */
+  .guests-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 16px 16px;
+  }
+  .guests-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-card);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    overflow: hidden;
+    min-width: 900px;
+  }
+  .guests-table thead th {
+    text-align: left;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 700;
+    padding: 10px 10px;
+    border-bottom: 1px solid var(--rule);
+    background: rgba(122,160,194,0.06);
+    white-space: nowrap;
+  }
+  .guests-table tbody td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--rule-soft);
+    font-size: 13px;
+    color: var(--ink);
+    vertical-align: top;
+  }
+  .guests-table tbody tr:last-child td { border-bottom: none; }
+  .guests-table tbody tr.rsvp-confirmed { border-left: 3px solid var(--forest); }
+  .guests-table tbody tr.rsvp-tbd { border-left: 3px solid var(--clay); }
+  .guests-table tbody tr.rsvp-declined { border-left: 3px solid var(--ink-faint); opacity: 0.65; }
+  .guests-table .gt-num { width: 36px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+  .guests-table .gt-name { min-width: 140px; }
+  .guests-table .gt-rsvp { width: 96px; }
+  .guests-table .gt-days { width: 130px; }
+  .guests-table .gt-shirt { width: 60px; text-align: center; }
+  .guests-table .gt-phone { width: 130px; }
+  .guests-table .gt-del { width: 28px; }
+  .gt-cell {
+    display: inline-block;
+    min-height: 18px;
+    min-width: 30px;
+    outline: none;
+    padding: 2px 4px;
+    border-radius: 4px;
+    cursor: text;
+    word-break: break-word;
+  }
+  .gt-cell:hover { background: rgba(122,160,194,0.10); }
+  .gt-cell:focus { background: white; box-shadow: 0 0 0 2px var(--clay-soft); }
+  .gt-cell:empty::before { content: attr(data-placeholder); color: var(--ink-faint); font-style: italic; }
+  .gt-name-row { display: flex; flex-direction: column; gap: 1px; }
+  .gt-name-row .gt-first { font-weight: 600; }
+  .gt-name-row .gt-last { font-size: 11.5px; color: var(--ink-soft); }
+  .gt-name-row .gt-bride { font-size: 9px; font-style: italic; color: var(--clay); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 2px; }
+  .gt-rsvp-pill {
+    display: inline-block;
+    font-size: 9.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 3px 9px; border-radius: 100px;
+    cursor: pointer;
+    outline: none;
+    min-width: 70px; text-align: center;
+  }
+  .gt-rsvp-pill.rsvp-confirmed { background: rgba(74,142,149,0.14); color: var(--forest); }
+  .gt-rsvp-pill.rsvp-tbd { background: rgba(122,160,194,0.16); color: var(--clay); }
+  .gt-rsvp-pill.rsvp-declined { background: rgba(133,151,168,0.16); color: var(--ink-faint); }
+  .gt-day-chips { display: flex; gap: 3px; }
+  .gt-chip {
+    font-size: 9.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 3px 7px; border-radius: 4px;
+    background: rgba(133,151,168,0.10); color: var(--ink-faint); border: 1px solid var(--rule-soft);
+    cursor: pointer; user-select: none;
+  }
+  .gt-chip.is-yes { background: rgba(74,142,149,0.14); color: var(--forest); border-color: var(--forest); }
+  .gt-chip.is-no { opacity: 0.4; }
+  .guests-table .gt-del-btn {
+    background: transparent; border: none; color: var(--ink-faint);
+    font-size: 16px; cursor: pointer; padding: 2px 6px; line-height: 1;
+    opacity: 0;
+  }
+  .guests-table tbody tr:hover .gt-del-btn { opacity: 1; }
+  .gt-del-btn:hover { color: var(--behind); }
+  @media (max-width: 600px) {
+    .guests-table-wrap { padding: 0 12px 14px; }
+    .guests-table { min-width: 760px; }
+    .guests-table thead th, .guests-table tbody td { padding: 6px 8px; font-size: 12px; }
+  }
+
+  /* (Old grid layout, kept for any leftover refs) */
   .guests-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -1827,7 +1922,28 @@
       <div class="data-meta" id="guests-meta"></div>
       <button class="data-add-btn" onclick="addGuestRow()">+ Add guest</button>
     </div>
-    <div class="guests-grid" id="guests-grid"></div>
+    <div class="guests-table-wrap">
+      <table class="guests-table">
+        <thead>
+          <tr>
+            <th class="gt-num">#</th>
+            <th class="gt-name">Name</th>
+            <th class="gt-rsvp">RSVP</th>
+            <th class="gt-days">Days</th>
+            <th class="gt-shirt">Shirt</th>
+            <th class="gt-text">Dietary</th>
+            <th class="gt-text">Snacks</th>
+            <th class="gt-text">Drinks</th>
+            <th class="gt-phone">Phone</th>
+            <th class="gt-text">Venmo</th>
+            <th class="gt-text">Room</th>
+            <th class="gt-text">Notes</th>
+            <th class="gt-del"></th>
+          </tr>
+        </thead>
+        <tbody id="guests-tbody"></tbody>
+      </table>
+    </div>
   </div>
 </div>
 
@@ -2102,7 +2218,15 @@ function attachCellHandlers(row, item, onChange) {
 // ----- GUESTS -----
 function renderGuests() {
   ensureGuestsState();
+  const tbody = document.getElementById('guests-tbody');
+  if (tbody) {
+    renderGuestsTable(tbody);
+    updateGuestsMeta();
+    return;
+  }
+  // (fallback to old grid if ever needed)
   const grid = document.getElementById('guests-grid');
+  if (!grid) return;
   grid.innerHTML = '';
   state.guests.forEach((g) => {
     const card = document.createElement('div');
@@ -2185,6 +2309,82 @@ function renderGuests() {
   });
   updateGuestsMeta();
 }
+function renderGuestsTable(tbody) {
+  tbody.innerHTML = '';
+  state.guests.forEach((g, idx) => {
+    const tr = document.createElement('tr');
+    tr.dataset.id = g.id;
+    const rsvpRaw = (g.rsvp || '').toLowerCase();
+    const rsvpClass = rsvpRaw === 'confirmed' ? 'rsvp-confirmed' : rsvpRaw === 'tbd' ? 'rsvp-tbd' : rsvpRaw === 'declined' ? 'rsvp-declined' : '';
+    tr.className = rsvpClass;
+    const lastTxt = escapeHTML(g.last || '');
+    const isBride = /bride/i.test(g.last || '');
+    const lastClean = isBride ? lastTxt.replace(/\s*\(.*?\)\s*/g, '') : lastTxt;
+    const chip = (v, name, field) => {
+      const yes = (v||'').toLowerCase().startsWith('y');
+      const no = (v||'').toLowerCase().startsWith('n');
+      const cls = yes ? 'is-yes' : no ? 'is-no' : '';
+      return `<span class="gt-chip ${cls}" data-field="${field}">${name}</span>`;
+    };
+    const cell = (val, field, placeholder) =>
+      `<span class="gt-cell" contenteditable="true" data-field="${field}" data-placeholder="${placeholder}">${escapeHTML(val||'')}</span>`;
+    tr.innerHTML = `
+      <td class="gt-num">${idx + 1}</td>
+      <td class="gt-name">
+        <div class="gt-name-row">
+          <span class="gt-cell gt-first" contenteditable="true" data-field="first" data-placeholder="First">${escapeHTML(g.first||'')}</span>
+          <span class="gt-cell gt-last" contenteditable="true" data-field="last" data-placeholder="Last">${lastClean}</span>
+          ${isBride ? '<span class="gt-bride">bride</span>' : ''}
+        </div>
+      </td>
+      <td><span class="gt-rsvp-pill ${rsvpClass}" contenteditable="true" data-field="rsvp" data-placeholder="TBD">${escapeHTML(g.rsvp||'')}</span></td>
+      <td><div class="gt-day-chips">${chip(g.friday,'F','friday')}${chip(g.saturday,'S','saturday')}${chip(g.sunday,'Su','sunday')}</div></td>
+      <td>${cell(g.sweatshirt, 'sweatshirt', '—')}</td>
+      <td>${cell(g.dietary, 'dietary', '—')}</td>
+      <td>${cell(g.snacks, 'snacks', '—')}</td>
+      <td>${cell(g.drinks, 'drinks', '—')}</td>
+      <td>${cell(g.phone, 'phone', '—')}</td>
+      <td>${cell(g.venmo, 'venmo', '@…')}</td>
+      <td>${cell(g.room, 'room', '—')}</td>
+      <td>${cell(g.comment, 'comment', '—')}</td>
+      <td><button class="gt-del-btn" title="Remove">×</button></td>
+    `;
+    // Day chip toggles
+    tr.querySelectorAll('.gt-chip').forEach(c => {
+      c.addEventListener('click', () => {
+        const f = c.dataset.field;
+        g[f] = ((g[f]||'').toLowerCase() === 'yes') ? 'No' : 'Yes';
+        persist();
+        renderGuestsTable(tbody);
+        updateGuestsMeta();
+      });
+    });
+    // Editable cells (including RSVP pill)
+    tr.querySelectorAll('[contenteditable="true"]').forEach(el => {
+      el.addEventListener('blur', () => {
+        const field = el.dataset.field;
+        const newVal = el.textContent.trim();
+        if (newVal !== (g[field] || '')) {
+          g[field] = newVal;
+          persist();
+          if (field === 'rsvp') { renderGuestsTable(tbody); updateGuestsMeta(); }
+        }
+      });
+      el.addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); el.blur(); }
+      });
+    });
+    tr.querySelector('.gt-del-btn').addEventListener('click', () => {
+      if (!confirm('Remove this guest?')) return;
+      state.guests = state.guests.filter(x => x.id !== g.id);
+      persist();
+      renderGuestsTable(tbody);
+      updateGuestsMeta();
+    });
+    tbody.appendChild(tr);
+  });
+}
+
 function updateGuestsMeta() {
   const total = state.guests.length;
   const conf = state.guests.filter(g => g.rsvp === 'Confirmed').length;
