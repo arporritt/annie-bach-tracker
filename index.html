@@ -1346,6 +1346,127 @@
     border-radius: 8px;
     box-shadow: var(--shadow);
   }
+  /* ============ EXPENSE TRACKER ============ */
+  .exp-summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    background: var(--bg-card);
+    border: 1px solid var(--rule);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    padding: 22px 26px;
+    margin: 0 16px 22px;
+  }
+  .exp-sum-cell { border-right: 1px solid var(--rule-soft); padding-right: 16px; }
+  .exp-sum-cell:last-child { border-right: none; }
+  .exp-sum-label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); font-weight: 700; margin-bottom: 6px; }
+  .exp-sum-value { font-family: 'Fraunces', serif; font-size: 26px; letter-spacing: -0.02em; color: var(--ink); }
+  .exp-sum-value.is-good { color: var(--forest); }
+  .exp-sum-value.is-bad { color: var(--behind); }
+  .exp-sum-sub { font-size: 11px; color: var(--ink-faint); font-style: italic; margin-top: 2px; }
+  @media (max-width: 600px) {
+    .exp-summary { grid-template-columns: repeat(2, 1fr); padding: 14px; gap: 10px; margin: 0 12px 14px; }
+    .exp-sum-cell { border-right: none; padding-right: 0; padding-bottom: 8px; border-bottom: 1px solid var(--rule-soft); }
+    .exp-sum-cell:nth-child(3), .exp-sum-cell:nth-child(4) { border-bottom: none; padding-bottom: 0; }
+    .exp-sum-value { font-size: 19px; }
+  }
+
+  .exp-section { background: var(--bg-card); border: 1px solid var(--rule); border-radius: 12px; margin: 0 16px 18px; overflow: hidden; }
+  .exp-section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--rule);
+    background: linear-gradient(180deg, rgba(122,160,194,0.06), transparent);
+  }
+  .exp-section-header h3 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 17px; color: var(--ink); margin: 0; }
+  .exp-section-hint { font-size: 11px; color: var(--ink-faint); font-style: italic; }
+  .exp-table-wrap { overflow-x: auto; }
+  .exp-table { width: 100%; border-collapse: collapse; min-width: 720px; }
+  .exp-table thead th {
+    text-align: left;
+    font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--ink-faint); font-weight: 700;
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--rule);
+    background: rgba(122,160,194,0.04);
+    white-space: nowrap;
+  }
+  .exp-table tbody td { padding: 8px 14px; border-bottom: 1px solid var(--rule-soft); font-size: 12.5px; color: var(--ink); vertical-align: middle; }
+  .exp-table tbody tr:last-child td { border-bottom: none; }
+  .exp-table .exp-amt { width: 110px; text-align: right; font-variant-numeric: tabular-nums; }
+  .exp-table .exp-cat { width: 130px; }
+  .exp-table .exp-by { width: 110px; }
+  .exp-table .exp-date { width: 110px; }
+  .exp-table .exp-del { width: 36px; }
+  .exp-table .exp-status { width: 130px; }
+  .exp-table .exp-pay { width: 130px; text-align: right; }
+  .exp-input {
+    width: 100%;
+    border: 1px solid transparent;
+    background: transparent;
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 12.5px;
+    color: var(--ink);
+    outline: none;
+  }
+  .exp-input:hover { border-color: var(--rule-soft); }
+  .exp-input:focus { border-color: var(--clay); background: white; }
+  .exp-input.amount { text-align: right; font-variant-numeric: tabular-nums; }
+  .exp-del-btn { background: transparent; border: none; cursor: pointer; font-size: 16px; color: var(--ink-faint); padding: 2px 6px; border-radius: 4px; opacity: 0; }
+  .exp-table tbody tr:hover .exp-del-btn { opacity: 1; }
+  .exp-del-btn:hover { color: var(--behind); }
+  .bal-status {
+    display: inline-block; font-size: 9.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 3px 9px; border-radius: 100px;
+  }
+  .bal-status.paid { background: rgba(74,142,149,0.16); color: var(--forest); }
+  .bal-status.partial { background: rgba(122,160,194,0.16); color: var(--clay); }
+  .bal-status.unpaid { background: rgba(133,151,168,0.16); color: var(--ink-faint); }
+  .bal-status.bride { background: rgba(218,170,128,0.18); color: #a4661d; }
+  .bal-row { cursor: pointer; }
+  .bal-row:hover { background: rgba(122,160,194,0.05); }
+  .bal-row.is-expanded { background: rgba(122,160,194,0.06); }
+  .bal-row.bride { opacity: 0.7; cursor: default; background: rgba(218,170,128,0.05); }
+  .bal-pay-btn {
+    background: var(--clay); color: white;
+    border: none; border-radius: 100px;
+    padding: 4px 12px;
+    font-family: 'Manrope', sans-serif; font-size: 10.5px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    cursor: pointer;
+  }
+  .bal-pay-btn:hover { background: var(--plum); }
+  .bal-pay-count { font-size: 10.5px; color: var(--ink-faint); font-style: italic; margin-right: 8px; }
+  .bal-detail-row td { padding: 0 14px 8px; background: rgba(122,160,194,0.04); border-top: none !important; }
+  .pay-list { display: flex; flex-direction: column; gap: 4px; padding: 8px 0; }
+  .pay-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 6px 10px; border-radius: 6px;
+    background: var(--bg-card);
+    font-size: 12px;
+    border: 1px solid var(--rule-soft);
+  }
+  .pay-item .pay-amt { font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; min-width: 60px; }
+  .pay-item .pay-type {
+    font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600;
+    padding: 2px 7px; border-radius: 100px; background: rgba(122,160,194,0.14); color: var(--clay);
+  }
+  .pay-item .pay-meta { color: var(--ink-soft); flex: 1; }
+  .pay-item .pay-del {
+    background: transparent; border: none; cursor: pointer; color: var(--ink-faint);
+    font-size: 14px; padding: 2px 6px;
+  }
+  .pay-item .pay-del:hover { color: var(--behind); }
+  .bride-toggle {
+    background: transparent; border: 1px solid var(--rule); border-radius: 100px;
+    padding: 2px 8px; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--ink-faint); cursor: pointer; margin-left: 8px;
+  }
+  .bride-toggle.active { background: rgba(218,170,128,0.18); color: #a4661d; border-color: #d0a778; }
+
   /* ============ GUESTS TABLE ============ */
   .guests-table-wrap {
     overflow-x: auto;
@@ -1838,6 +1959,7 @@
     <button class="tab-btn active" data-tab="weeks" data-group="plan">Week-by-week</button>
     <button class="tab-btn" data-tab="list" data-group="plan">Task list</button>
     <button class="tab-btn" data-tab="budget" data-group="budget">Overview</button>
+    <button class="tab-btn" data-tab="expenses" data-group="budget">Expense tracker</button>
     <button class="tab-btn" data-tab="guests" data-group="design">Guests</button>
     <button class="tab-btn" data-tab="grocery" data-group="design">Grocery</button>
     <button class="tab-btn" data-tab="ideas" data-group="design">Ideas</button>
@@ -2040,6 +2162,90 @@
     </div>
     <div class="budget-summary" id="budget-summary"></div>
     <div id="budget-categories"></div>
+  </div>
+</div>
+
+<!-- ============ EXPENSE TRACKER TAB ============ -->
+<div class="tab-content" id="tab-expenses">
+  <div class="data-shell">
+    <div class="data-toolbar">
+      <h2 class="data-title">Expense tracker</h2>
+      <div class="data-meta" id="expenses-meta"></div>
+    </div>
+    <div class="exp-summary" id="exp-summary"></div>
+    <div class="exp-section">
+      <div class="exp-section-header">
+        <h3>Expenses paid out</h3>
+        <button class="data-add-btn" onclick="addExpense()">+ Add expense</button>
+      </div>
+      <div class="exp-table-wrap">
+        <table class="exp-table" id="exp-table">
+          <thead><tr>
+            <th>Vendor / Item</th>
+            <th class="exp-cat">Category</th>
+            <th class="exp-amt">Amount</th>
+            <th class="exp-by">Paid by</th>
+            <th class="exp-date">Date</th>
+            <th>Note</th>
+            <th class="exp-del"></th>
+          </tr></thead>
+          <tbody id="exp-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="exp-section">
+      <div class="exp-section-header">
+        <h3>Guest balances</h3>
+        <span class="exp-section-hint">Click a row to add a payment</span>
+      </div>
+      <div class="exp-table-wrap">
+        <table class="exp-table" id="bal-table">
+          <thead><tr>
+            <th>Guest</th>
+            <th class="exp-amt">Owed</th>
+            <th class="exp-amt">Paid</th>
+            <th class="exp-amt">Remaining</th>
+            <th class="exp-status">Status</th>
+            <th class="exp-pay">Payments</th>
+          </tr></thead>
+          <tbody id="bal-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ADD PAYMENT MODAL ============ -->
+<div class="modal-overlay" id="pay-modal">
+  <div class="modal">
+    <h3 id="pay-modal-title">Add payment</h3>
+    <div class="modal-row"><label>Guest</label><input type="text" id="p-guest" readonly></div>
+    <div class="modal-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+      <div><label>Amount</label><input type="text" id="p-amount" placeholder="$200"></div>
+      <div><label>Type</label>
+        <select id="p-type">
+          <option value="deposit">Deposit</option>
+          <option value="interim">Interim</option>
+          <option value="final">Final</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+      <div><label>Date</label><input type="date" id="p-date"></div>
+      <div><label>Method</label>
+        <select id="p-method">
+          <option value="Venmo">Venmo</option>
+          <option value="Cash">Cash</option>
+          <option value="Zelle">Zelle</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-row"><label>Note (optional)</label><input type="text" id="p-note" placeholder="Reference / memo"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closePayModal()">Cancel</button>
+      <button class="btn-save" onclick="savePayment()">Save</button>
+    </div>
   </div>
 </div>
 
@@ -3614,11 +3820,268 @@ function renderActive() {
   if (active === 'weeks') renderWeeks();
   else if (active === 'list') renderList();
   else if (active === 'budget') renderBudget();
+  else if (active === 'expenses') renderExpenses();
   else if (active === 'guests') renderGuests();
   else if (active === 'grocery') renderGrocery();
   else if (active === 'ideas') renderIdeas();
   else if (active === 'itinerary') renderItinerary();
 }
+
+// ============================================================
+// EXPENSE TRACKER
+// ============================================================
+const EXPENSE_CATEGORIES = ['Lodging', 'Entertainment', 'Food & drink', 'Swag', 'Misc'];
+
+const SEED_EXPENSES = [
+  { vendor: 'Airbnb — 767 Phoenix St', category: 'Lodging',       amount: 0, paidBy: 'Allie', date: '', note: 'Deposit + balance' },
+  { vendor: 'Magician (Saturday)',     category: 'Entertainment', amount: 0, paidBy: 'Allie', date: '', note: 'Contract signed' },
+  { vendor: 'Boat charter',            category: 'Entertainment', amount: 0, paidBy: 'Allie', date: '', note: 'Deposit + balance' },
+  { vendor: 'Yoga teacher',            category: 'Entertainment', amount: 0, paidBy: 'Allie', date: '', note: '' }
+];
+
+function ensureExpenseState() {
+  if (!state.expenses || !Array.isArray(state.expenses.items)) {
+    state.expenses = { items: SEED_EXPENSES.map(e => ({ id: uid(), ...e })) };
+  }
+  if (!Array.isArray(state.payments)) state.payments = [];
+  // Default-mark the bride (Annie Porritt) as nonPayer if no one is marked yet
+  if (Array.isArray(state.guests) && !state.guests.some(g => g.nonPayer)) {
+    const bride = state.guests.find(g =>
+      (g.first||'').toLowerCase() === 'annie' &&
+      (g.last||'').toLowerCase().replace(/\(.*?\)/g,'').trim() === 'porritt'
+    );
+    if (bride) bride.nonPayer = true;
+  }
+}
+
+function isPayingGuest(g) {
+  return (g.rsvp || '').toLowerCase() === 'confirmed' && !g.nonPayer;
+}
+
+function payingGuests() {
+  return (state.guests || []).filter(isPayingGuest);
+}
+
+function totalExpenses() {
+  return (state.expenses?.items || []).reduce((s, e) => s + (Number(e.amount) || 0), 0);
+}
+
+function paymentsForGuest(guestId) {
+  return (state.payments || []).filter(p => p.guestId === guestId);
+}
+
+function paidByGuest(guestId) {
+  return paymentsForGuest(guestId).reduce((s, p) => s + (Number(p.amount) || 0), 0);
+}
+
+function renderExpenses() {
+  ensureExpenseState();
+  const items = state.expenses.items;
+  const total = totalExpenses();
+  const guests = payingGuests();
+  const perGuest = guests.length ? total / guests.length : 0;
+  const totalCollected = (state.payments || []).reduce((s, p) => s + (Number(p.amount) || 0), 0);
+  const outstanding = Math.max(0, (perGuest * guests.length) - totalCollected);
+
+  document.getElementById('exp-summary').innerHTML = `
+    <div class="exp-sum-cell">
+      <div class="exp-sum-label">Total spent</div>
+      <div class="exp-sum-value">${fmtMoney(total)}</div>
+      <div class="exp-sum-sub">${items.filter(i=>Number(i.amount)>0).length} of ${items.length} paid</div>
+    </div>
+    <div class="exp-sum-cell">
+      <div class="exp-sum-label">Per guest share</div>
+      <div class="exp-sum-value">${fmtMoney(perGuest)}</div>
+      <div class="exp-sum-sub">÷ ${guests.length} paying guests</div>
+    </div>
+    <div class="exp-sum-cell">
+      <div class="exp-sum-label">Collected</div>
+      <div class="exp-sum-value is-good">${fmtMoney(totalCollected)}</div>
+      <div class="exp-sum-sub">${(state.payments||[]).length} payments logged</div>
+    </div>
+    <div class="exp-sum-cell">
+      <div class="exp-sum-label">Outstanding</div>
+      <div class="exp-sum-value ${outstanding > 0 ? 'is-bad' : 'is-good'}">${fmtMoney(outstanding)}</div>
+      <div class="exp-sum-sub">${outstanding > 0 ? 'still owed by guests' : 'fully collected'}</div>
+    </div>
+  `;
+  document.getElementById('expenses-meta').textContent =
+    `${fmtMoney(total)} spent · ${fmtMoney(perGuest)} per guest · ${fmtMoney(totalCollected)} collected`;
+
+  renderExpenseRows();
+  renderBalances();
+}
+
+function renderExpenseRows() {
+  const tbody = document.getElementById('exp-tbody');
+  tbody.innerHTML = '';
+  state.expenses.items.forEach(e => {
+    const tr = document.createElement('tr');
+    tr.dataset.id = e.id;
+    tr.innerHTML = `
+      <td><input class="exp-input" data-f="vendor" value="${escapeHTML(e.vendor||'')}" placeholder="What was paid"></td>
+      <td>
+        <select class="exp-input" data-f="category">
+          ${EXPENSE_CATEGORIES.map(c => `<option ${c===e.category?'selected':''}>${escapeHTML(c)}</option>`).join('')}
+        </select>
+      </td>
+      <td><input class="exp-input amount" data-f="amount" value="${e.amount ? fmtMoney(e.amount) : ''}" placeholder="—"></td>
+      <td><input class="exp-input" data-f="paidBy" value="${escapeHTML(e.paidBy||'')}" placeholder="Allie"></td>
+      <td><input type="date" class="exp-input" data-f="date" value="${escapeHTML(e.date||'')}"></td>
+      <td><input class="exp-input" data-f="note" value="${escapeHTML(e.note||'')}" placeholder="—"></td>
+      <td><button class="exp-del-btn" title="Delete">×</button></td>
+    `;
+    tr.querySelectorAll('.exp-input').forEach(inp => {
+      inp.addEventListener('change', ev => {
+        const f = inp.dataset.f;
+        const v = inp.value;
+        if (f === 'amount') e.amount = parseMoney(v);
+        else e[f] = v.trim();
+        persist();
+        renderExpenses();
+      });
+    });
+    tr.querySelector('.exp-del-btn').addEventListener('click', () => {
+      if (!confirm('Delete this expense?')) return;
+      state.expenses.items = state.expenses.items.filter(i => i.id !== e.id);
+      persist();
+      renderExpenses();
+    });
+    tbody.appendChild(tr);
+  });
+}
+
+let expandedBalGuestId = null;
+function renderBalances() {
+  const tbody = document.getElementById('bal-tbody');
+  tbody.innerHTML = '';
+  const total = totalExpenses();
+  const guests = payingGuests();
+  const perGuest = guests.length ? total / guests.length : 0;
+  (state.guests || []).forEach(g => {
+    const tr = document.createElement('tr');
+    const isPaying = isPayingGuest(g);
+    const isBride = !!g.nonPayer;
+    const isDeclined = (g.rsvp||'').toLowerCase() === 'declined';
+    if (isDeclined) return; // skip declined
+    tr.className = 'bal-row' + (isBride ? ' bride' : '') + (expandedBalGuestId === g.id ? ' is-expanded' : '');
+    tr.dataset.id = g.id;
+    const owed = isPaying ? perGuest : 0;
+    const paid = paidByGuest(g.id);
+    const remaining = Math.max(0, owed - paid);
+    let status, statusCls;
+    if (isBride) { status = 'Bride'; statusCls = 'bride'; }
+    else if (paid >= owed && owed > 0) { status = 'Paid in full'; statusCls = 'paid'; }
+    else if (paid > 0) { status = 'Partial'; statusCls = 'partial'; }
+    else { status = 'Not started'; statusCls = 'unpaid'; }
+    const payCount = paymentsForGuest(g.id).length;
+    const nameDisplay = `${escapeHTML(g.first||'')} ${escapeHTML((g.last||'').replace(/\(.*?\)/g,'').trim())}`;
+    tr.innerHTML = `
+      <td>
+        ${nameDisplay}
+        <button class="bride-toggle ${isBride ? 'active' : ''}" data-toggle-bride>${isBride ? '★ bride' : 'mark bride'}</button>
+      </td>
+      <td class="exp-amt">${fmtMoney(owed)}</td>
+      <td class="exp-amt">${fmtMoney(paid)}</td>
+      <td class="exp-amt">${fmtMoney(remaining)}</td>
+      <td class="exp-status"><span class="bal-status ${statusCls}">${status}</span></td>
+      <td class="exp-pay">
+        ${payCount > 0 ? `<span class="bal-pay-count">${payCount} ${payCount===1?'payment':'payments'}</span>` : ''}
+        ${isBride ? '' : `<button class="bal-pay-btn" data-add-payment>+ Add</button>`}
+      </td>
+    `;
+    // Bride toggle
+    tr.querySelector('[data-toggle-bride]').addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      g.nonPayer = !g.nonPayer;
+      persist();
+      renderExpenses();
+    });
+    // Add payment button
+    const payBtn = tr.querySelector('[data-add-payment]');
+    if (payBtn) payBtn.addEventListener('click', (ev) => { ev.stopPropagation(); openPayModal(g); });
+    // Click row to expand
+    tr.addEventListener('click', () => {
+      if (isBride) return;
+      expandedBalGuestId = expandedBalGuestId === g.id ? null : g.id;
+      renderBalances();
+    });
+    tbody.appendChild(tr);
+    // Expanded detail row
+    if (expandedBalGuestId === g.id) {
+      const detail = document.createElement('tr');
+      detail.className = 'bal-detail-row';
+      const pays = paymentsForGuest(g.id);
+      const html = pays.length
+        ? `<div class="pay-list">${pays.map(p => `
+            <div class="pay-item">
+              <span class="pay-amt">${fmtMoney(p.amount)}</span>
+              <span class="pay-type">${escapeHTML(p.type||'')}</span>
+              <span class="pay-meta">${escapeHTML(p.date||'')} · ${escapeHTML(p.method||'')}${p.note?' · '+escapeHTML(p.note):''}</span>
+              <button class="pay-del" data-pid="${p.id}" title="Delete payment">×</button>
+            </div>`).join('')}</div>`
+        : `<div style="padding: 12px; color: var(--ink-faint); font-style: italic;">No payments yet.</div>`;
+      detail.innerHTML = `<td colspan="6">${html}</td>`;
+      detail.querySelectorAll('.pay-del').forEach(btn => {
+        btn.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          const pid = btn.dataset.pid;
+          if (!confirm('Delete this payment?')) return;
+          state.payments = state.payments.filter(p => p.id !== pid);
+          persist();
+          renderExpenses();
+        });
+      });
+      tbody.appendChild(detail);
+    }
+  });
+}
+
+function addExpense() {
+  ensureExpenseState();
+  state.expenses.items.push({ id: uid(), vendor:'', category: EXPENSE_CATEGORIES[0], amount:0, paidBy:'Allie', date:'', note:'' });
+  persist();
+  renderExpenses();
+  setTimeout(() => {
+    const inputs = document.querySelectorAll('#exp-tbody tr:last-child .exp-input[data-f="vendor"]');
+    if (inputs.length) inputs[0].focus();
+  }, 0);
+}
+
+let payModalGuestId = null;
+function openPayModal(g) {
+  payModalGuestId = g.id;
+  document.getElementById('pay-modal-title').textContent = 'Add payment — ' + (g.first||'') + ' ' + (g.last||'').replace(/\(.*?\)/g,'').trim();
+  document.getElementById('p-guest').value = (g.first||'') + ' ' + (g.last||'').replace(/\(.*?\)/g,'').trim();
+  document.getElementById('p-amount').value = '';
+  document.getElementById('p-type').value = paymentsForGuest(g.id).length === 0 ? 'deposit' : 'final';
+  document.getElementById('p-date').value = new Date().toISOString().slice(0,10);
+  document.getElementById('p-method').value = 'Venmo';
+  document.getElementById('p-note').value = '';
+  document.getElementById('pay-modal').classList.add('active');
+  setTimeout(() => document.getElementById('p-amount').focus(), 50);
+}
+function closePayModal() {
+  document.getElementById('pay-modal').classList.remove('active');
+  payModalGuestId = null;
+}
+function savePayment() {
+  if (!payModalGuestId) return;
+  const amount = parseMoney(document.getElementById('p-amount').value);
+  if (!amount || amount <= 0) { alert('Enter an amount.'); return; }
+  const type = document.getElementById('p-type').value;
+  const date = document.getElementById('p-date').value;
+  const method = document.getElementById('p-method').value;
+  const note = document.getElementById('p-note').value.trim();
+  state.payments = state.payments || [];
+  state.payments.push({ id: uid(), guestId: payModalGuestId, amount, type, date, method, note });
+  persist();
+  closePayModal();
+  renderExpenses();
+}
+document.getElementById('pay-modal').addEventListener('click', (e) => {
+  if (e.target.id === 'pay-modal') closePayModal();
+});
 
 // ============================================================
 // BUDGET (bach)
