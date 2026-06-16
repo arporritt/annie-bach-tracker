@@ -1359,38 +1359,45 @@
     border: 1px solid var(--rule);
     border-radius: 10px;
     overflow: hidden;
-    min-width: 900px;
+    min-width: 1380px;
+    table-layout: fixed;
   }
   .guests-table thead th {
     text-align: left;
-    font-size: 10px;
+    font-size: 9.5px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--ink-faint);
     font-weight: 700;
-    padding: 10px 10px;
+    padding: 8px 8px;
     border-bottom: 1px solid var(--rule);
     background: rgba(122,160,194,0.06);
     white-space: nowrap;
   }
   .guests-table tbody td {
-    padding: 8px 10px;
+    padding: 7px 8px;
     border-bottom: 1px solid var(--rule-soft);
-    font-size: 13px;
+    font-size: 12px;
+    line-height: 1.4;
     color: var(--ink);
     vertical-align: top;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
   .guests-table tbody tr:last-child td { border-bottom: none; }
   .guests-table tbody tr.rsvp-confirmed { border-left: 3px solid var(--forest); }
   .guests-table tbody tr.rsvp-tbd { border-left: 3px solid var(--clay); }
   .guests-table tbody tr.rsvp-declined { border-left: 3px solid var(--ink-faint); opacity: 0.65; }
-  .guests-table .gt-num { width: 36px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
-  .guests-table .gt-name { min-width: 140px; }
+  .guests-table .gt-num { width: 32px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+  .guests-table .gt-name { width: 130px; }
   .guests-table .gt-rsvp { width: 96px; }
-  .guests-table .gt-days { width: 130px; }
-  .guests-table .gt-shirt { width: 60px; text-align: center; }
-  .guests-table .gt-phone { width: 130px; }
+  .guests-table .gt-days { width: 116px; }
+  .guests-table .gt-shirt { width: 54px; text-align: center; }
+  .guests-table .gt-text { width: 130px; }
+  .guests-table .gt-phone { width: 120px; }
   .guests-table .gt-del { width: 28px; }
+  .gt-cell { word-break: normal; }
+  .guests-table .gt-name .gt-first { font-size: 13px; }
   .gt-cell {
     display: inline-block;
     min-height: 18px;
