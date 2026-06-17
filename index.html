@@ -2362,7 +2362,6 @@
             <th class="exp-cat">Category</th>
             <th class="exp-amt">Amount</th>
             <th class="exp-by">Paid by</th>
-            <th class="exp-date">Date</th>
             <th>Note</th>
             <th class="exp-del"></th>
           </tr></thead>
@@ -4219,7 +4218,6 @@ function renderExpenseRows() {
       </td>
       <td><input class="exp-input amount" data-f="amount" value="${e.amount ? fmtMoney(e.amount) : ''}" placeholder="—"></td>
       <td><input class="exp-input" data-f="paidBy" value="${escapeHTML(e.paidBy||'')}" placeholder="Allie"></td>
-      <td><input type="date" class="exp-input" data-f="date" value="${escapeHTML(e.date||'')}"></td>
       <td><input class="exp-input" data-f="note" value="${escapeHTML(e.note||'')}" placeholder="—"></td>
       <td><button class="exp-del-btn" title="Delete">×</button></td>
     `;
