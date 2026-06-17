@@ -1564,7 +1564,18 @@
   .exp-table .exp-by { width: 110px; }
   .exp-table .exp-date { width: 110px; }
   .exp-table .exp-del { width: 36px; }
-  .exp-table .exp-status { width: 130px; }
+  .exp-table .exp-status { width: 110px; }
+  .exp-status-btn {
+    display: inline-block;
+    font-size: 9.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 100px;
+    border: 1px solid transparent; cursor: pointer;
+    min-width: 84px; text-align: center;
+    transition: background 0.15s;
+  }
+  .exp-status-btn.is-paid { background: rgba(74,142,149,0.18); color: var(--forest); border-color: var(--forest); }
+  .exp-status-btn.is-pending { background: rgba(218,170,128,0.18); color: #a4661d; border-color: #d0a778; }
+  .exp-status-btn:hover { filter: brightness(0.95); }
   .exp-table .exp-pay { width: 130px; text-align: right; }
   .exp-input {
     width: 100%;
@@ -2362,6 +2373,7 @@
             <th class="exp-cat">Category</th>
             <th class="exp-amt">Amount</th>
             <th class="exp-by">Paid by</th>
+            <th class="exp-status">Status</th>
             <th>Note</th>
             <th class="exp-del"></th>
           </tr></thead>
@@ -4170,16 +4182,37 @@ function renderExpenses() {
   const totalCollected = (state.payments || []).reduce((s, p) => s + (Number(p.amount) || 0), 0);
   const outstanding = Math.max(0, (perGuest * guests.length) - totalCollected);
 
+  const paidExpenses = items.filter(i => i.paid).reduce((s, i) => s + (Number(i.amount) || 0), 0);
+  const pendingExpenses = items.filter(i => !i.paid).reduce((s, i) => s + (Number(i.amount) || 0), 0);
+  const paidCount = items.filter(i => i.paid).length;
+  const pendingCount = items.filter(i => !i.paid).length;
   const spendSummary = `
     <div class="exp-sum-cell">
-      <div class="exp-sum-label">Total spent</div>
+      <div class="exp-sum-label">Total budget</div>
       <div class="exp-sum-value">${fmtMoney(total)}</div>
-      <div class="exp-sum-sub">${items.filter(i=>Number(i.amount)>0).length} of ${items.length} paid</div>
+      <div class="exp-sum-sub">${items.length} line items</div>
+    </div>
+    <div class="exp-sum-cell">
+      <div class="exp-sum-label">Paid out</div>
+      <div class="exp-sum-value is-good">${fmtMoney(paidExpenses)}</div>
+      <div class="exp-sum-sub">${paidCount} ${paidCount===1?'item':'items'} paid</div>
+    </div>
+    <div class="exp-sum-cell">
+      <div class="exp-sum-label">Still pending</div>
+      <div class="exp-sum-value ${pendingExpenses > 0 ? 'is-bad' : 'is-good'}">${fmtMoney(pendingExpenses)}</div>
+      <div class="exp-sum-sub">${pendingCount} ${pendingCount===1?'item':'items'} pending</div>
     </div>
     <div class="exp-sum-cell">
       <div class="exp-sum-label">Per guest share</div>
       <div class="exp-sum-value">${fmtMoney(perGuest)}</div>
       <div class="exp-sum-sub">÷ ${guests.length} paying guests</div>
+    </div>
+  `;
+  const reimburseSummary = `
+    <div class="exp-sum-cell">
+      <div class="exp-sum-label">Total to collect</div>
+      <div class="exp-sum-value">${fmtMoney(perGuest * guests.length)}</div>
+      <div class="exp-sum-sub">${fmtMoney(perGuest)} × ${guests.length} guests</div>
     </div>
     <div class="exp-sum-cell">
       <div class="exp-sum-label">Collected</div>
@@ -4191,10 +4224,15 @@ function renderExpenses() {
       <div class="exp-sum-value ${outstanding > 0 ? 'is-bad' : 'is-good'}">${fmtMoney(outstanding)}</div>
       <div class="exp-sum-sub">${outstanding > 0 ? 'still owed by guests' : 'fully collected'}</div>
     </div>
+    <div class="exp-sum-cell">
+      <div class="exp-sum-label">Per guest share</div>
+      <div class="exp-sum-value">${fmtMoney(perGuest)}</div>
+      <div class="exp-sum-sub">÷ ${guests.length} paying guests</div>
+    </div>
   `;
   const spendEl = document.getElementById('spend-summary'); if (spendEl) spendEl.innerHTML = spendSummary;
-  const reimburseEl = document.getElementById('reimburse-summary'); if (reimburseEl) reimburseEl.innerHTML = spendSummary;
-  const spendMeta = document.getElementById('spend-meta'); if (spendMeta) spendMeta.textContent = `${fmtMoney(total)} spent · ${items.length} line items`;
+  const reimburseEl = document.getElementById('reimburse-summary'); if (reimburseEl) reimburseEl.innerHTML = reimburseSummary;
+  const spendMeta = document.getElementById('spend-meta'); if (spendMeta) spendMeta.textContent = `${fmtMoney(paidExpenses)} paid · ${fmtMoney(pendingExpenses)} pending`;
   const reimburseMeta = document.getElementById('reimburse-meta'); if (reimburseMeta) reimburseMeta.textContent = `${fmtMoney(totalCollected)} collected of ${fmtMoney(perGuest * guests.length)} expected`;
 
   if (document.getElementById('exp-tbody')) renderExpenseRows();
@@ -4218,6 +4256,7 @@ function renderExpenseRows() {
       </td>
       <td><input class="exp-input amount" data-f="amount" value="${e.amount ? fmtMoney(e.amount) : ''}" placeholder="—"></td>
       <td><input class="exp-input" data-f="paidBy" value="${escapeHTML(e.paidBy||'')}" placeholder="Allie"></td>
+      <td><button class="exp-status-btn ${e.paid ? 'is-paid' : 'is-pending'}" data-f="paid">${e.paid ? '✓ Paid' : 'Pending'}</button></td>
       <td><input class="exp-input" data-f="note" value="${escapeHTML(e.note||'')}" placeholder="—"></td>
       <td><button class="exp-del-btn" title="Delete">×</button></td>
     `;
@@ -4232,6 +4271,14 @@ function renderExpenseRows() {
         renderExpenses();
       });
     });
+    const statusBtn = tr.querySelector('.exp-status-btn');
+    if (statusBtn) {
+      statusBtn.addEventListener('click', () => {
+        e.paid = !e.paid;
+        persist();
+        renderExpenses();
+      });
+    }
     tr.querySelector('.exp-del-btn').addEventListener('click', () => {
       if (!confirm('Delete this expense?')) return;
       state.expenses.items = state.expenses.items.filter(i => i.id !== e.id);
