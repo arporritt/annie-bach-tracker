@@ -1348,15 +1348,24 @@
   }
   /* ============ ITINERARY DRAG-AND-DROP ============ */
   .itin-drag-col { width: 22px; }
-  .itin-drag {
+  .itin-drag, .exp-drag {
     cursor: grab; color: var(--ink-faint);
     text-align: center;
     font-size: 12px;
     letter-spacing: -2px;
     user-select: none;
     padding-right: 2px !important;
+    display: inline-block;
   }
-  .itin-drag:active { cursor: grabbing; }
+  .itin-drag:active, .exp-drag:active { cursor: grabbing; }
+  .gbc-entry { cursor: grab; }
+  .gbc-entry:active { cursor: grabbing; }
+  .gbc-entry.itin-dragging { opacity: 0.4; }
+  .gbc-entry.itin-over-top { box-shadow: 0 -2px 0 0 var(--clay) inset; }
+  .gbc-entry.itin-over-bottom { box-shadow: 0 2px 0 0 var(--clay) inset; }
+  #exp-tbody tr.itin-dragging { opacity: 0.4; }
+  #exp-tbody tr.itin-over-top td { box-shadow: 0 -2px 0 0 var(--clay) inset; }
+  #exp-tbody tr.itin-over-bottom td { box-shadow: 0 2px 0 0 var(--clay) inset; }
   tr.itin-dragging { opacity: 0.35; }
   tr.itin-over-top td { box-shadow: 0 -2px 0 0 var(--clay) inset; }
   tr.itin-over-bottom td { box-shadow: 0 2px 0 0 var(--clay) inset; }
@@ -4200,8 +4209,9 @@ function renderExpenseRows() {
   state.expenses.items.forEach(e => {
     const tr = document.createElement('tr');
     tr.dataset.id = e.id;
+    tr.draggable = true;
     tr.innerHTML = `
-      <td><input class="exp-input" data-f="vendor" value="${escapeHTML(e.vendor||'')}" placeholder="What was paid"></td>
+      <td><span class="exp-drag" title="Drag to reorder">⋮⋮</span><input class="exp-input" data-f="vendor" value="${escapeHTML(e.vendor||'')}" placeholder="What was paid" style="display:inline-block; width: calc(100% - 22px); margin-left: 4px;"></td>
       <td>
         <select class="exp-input" data-f="category">
           ${EXPENSE_CATEGORIES.map(c => `<option ${c===e.category?'selected':''}>${escapeHTML(c)}</option>`).join('')}
@@ -4213,6 +4223,7 @@ function renderExpenseRows() {
       <td><input class="exp-input" data-f="note" value="${escapeHTML(e.note||'')}" placeholder="—"></td>
       <td><button class="exp-del-btn" title="Delete">×</button></td>
     `;
+    attachExpenseDnD(tr, e);
     tr.querySelectorAll('.exp-input').forEach(inp => {
       inp.addEventListener('change', ev => {
         const f = inp.dataset.f;
@@ -4313,6 +4324,12 @@ function renderReimburseCards() {
         persist();
         renderExpenses();
       });
+    });
+    // Drag-to-reorder entries within this guest's installments
+    card.querySelectorAll('.gbc-entry').forEach(rowEl => {
+      const pid = rowEl.dataset.pid;
+      const pay = state.payments.find(p => p.id === pid);
+      if (pay) attachEntryDnD(rowEl, pay, g.id);
     });
     // Inline add
     const addBtn = card.querySelector('[data-add-entry]');
@@ -4422,6 +4439,95 @@ function renderBalances() {
       });
       tbody.appendChild(detail);
     }
+  });
+}
+
+let draggedExpenseId = null;
+function attachExpenseDnD(tr, e) {
+  tr.addEventListener('dragstart', ev => {
+    if (ev.target.closest('input,select,button')) { ev.preventDefault(); return; }
+    draggedExpenseId = e.id;
+    ev.dataTransfer.effectAllowed = 'move';
+    try { ev.dataTransfer.setData('text/plain', e.id); } catch(_) {}
+    tr.classList.add('itin-dragging');
+  });
+  tr.addEventListener('dragend', () => {
+    tr.classList.remove('itin-dragging');
+    document.querySelectorAll('#exp-tbody .itin-over-top,#exp-tbody .itin-over-bottom')
+      .forEach(el => el.classList.remove('itin-over-top','itin-over-bottom'));
+    draggedExpenseId = null;
+  });
+  tr.addEventListener('dragover', ev => {
+    if (!draggedExpenseId || draggedExpenseId === e.id) return;
+    ev.preventDefault();
+    ev.dataTransfer.dropEffect = 'move';
+    const rect = tr.getBoundingClientRect();
+    const below = (ev.clientY - rect.top) > rect.height / 2;
+    tr.classList.toggle('itin-over-top', !below);
+    tr.classList.toggle('itin-over-bottom', below);
+  });
+  tr.addEventListener('dragleave', () => {
+    tr.classList.remove('itin-over-top','itin-over-bottom');
+  });
+  tr.addEventListener('drop', ev => {
+    if (!draggedExpenseId || draggedExpenseId === e.id) return;
+    ev.preventDefault();
+    const below = tr.classList.contains('itin-over-bottom');
+    tr.classList.remove('itin-over-top','itin-over-bottom');
+    const srcIdx = state.expenses.items.findIndex(x => x.id === draggedExpenseId);
+    if (srcIdx < 0) return;
+    const [src] = state.expenses.items.splice(srcIdx, 1);
+    const dstIdx = state.expenses.items.findIndex(x => x.id === e.id);
+    if (dstIdx < 0) { state.expenses.items.splice(srcIdx, 0, src); return; }
+    const insertAt = below ? dstIdx + 1 : dstIdx;
+    state.expenses.items.splice(insertAt, 0, src);
+    persist();
+    renderExpenses();
+  });
+}
+
+let draggedEntryId = null;
+function attachEntryDnD(rowEl, pay, guestId) {
+  rowEl.draggable = true;
+  rowEl.addEventListener('dragstart', ev => {
+    if (ev.target.closest('button')) { ev.preventDefault(); return; }
+    draggedEntryId = pay.id;
+    ev.dataTransfer.effectAllowed = 'move';
+    try { ev.dataTransfer.setData('text/plain', pay.id); } catch(_) {}
+    rowEl.classList.add('itin-dragging');
+  });
+  rowEl.addEventListener('dragend', () => {
+    rowEl.classList.remove('itin-dragging');
+    document.querySelectorAll('.gbc-entry.itin-over-top, .gbc-entry.itin-over-bottom')
+      .forEach(el => el.classList.remove('itin-over-top','itin-over-bottom'));
+    draggedEntryId = null;
+  });
+  rowEl.addEventListener('dragover', ev => {
+    if (!draggedEntryId || draggedEntryId === pay.id) return;
+    ev.preventDefault();
+    const rect = rowEl.getBoundingClientRect();
+    const below = (ev.clientY - rect.top) > rect.height / 2;
+    rowEl.classList.toggle('itin-over-top', !below);
+    rowEl.classList.toggle('itin-over-bottom', below);
+  });
+  rowEl.addEventListener('dragleave', () => {
+    rowEl.classList.remove('itin-over-top','itin-over-bottom');
+  });
+  rowEl.addEventListener('drop', ev => {
+    if (!draggedEntryId || draggedEntryId === pay.id) return;
+    ev.preventDefault();
+    const below = rowEl.classList.contains('itin-over-bottom');
+    rowEl.classList.remove('itin-over-top','itin-over-bottom');
+    const src = state.payments.find(p => p.id === draggedEntryId);
+    if (!src || src.guestId !== guestId) return; // only reorder within same guest
+    const others = state.payments.filter(p => p.id !== draggedEntryId);
+    const dstIdx = others.findIndex(p => p.id === pay.id);
+    if (dstIdx < 0) { state.payments = [...others, src]; persist(); renderExpenses(); return; }
+    const insertAt = below ? dstIdx + 1 : dstIdx;
+    others.splice(insertAt, 0, src);
+    state.payments = others;
+    persist();
+    renderExpenses();
   });
 }
 
