@@ -4010,13 +4010,13 @@ function updateAllCounters() {
   const done = state.tasks.filter(t => t.done).length;
   const behind = state.tasks.filter(isBehind).length;
   const pct = total ? Math.round((done / total) * 100) : 0;
-  document.getElementById('done-count').textContent = done;
-  document.getElementById('total-count').textContent = ' / ' + total;
-  document.getElementById('pct-count').textContent = pct + '%';
-  document.getElementById('overall-fill').style.width = pct + '%';
-  document.getElementById('total-tasks').textContent = String(total).padStart(3, '0');
-  const bEl = document.getElementById('behind-count');
-  bEl.textContent = behind > 0 ? `${behind} behind` : '';
+  const set = (id, fn) => { const el = document.getElementById(id); if (el) fn(el); };
+  set('done-count', el => el.textContent = done);
+  set('total-count', el => el.textContent = ' / ' + total);
+  set('pct-count', el => el.textContent = pct + '%');
+  set('overall-fill', el => el.style.width = pct + '%');
+  set('total-tasks', el => el.textContent = String(total).padStart(3, '0'));
+  set('behind-count', el => el.textContent = behind > 0 ? `${behind} behind` : '');
 }
 
 function updateLastSaved() {
