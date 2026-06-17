@@ -1999,8 +1999,7 @@
     <button class="tab-btn active" data-tab="plan">Plan</button>
     <button class="tab-btn" data-tab="itinerary">Itinerary</button>
     <button class="tab-btn" data-tab="guests">Guest list</button>
-    <button class="tab-btn" data-tab="spend">Spend tracker</button>
-    <button class="tab-btn" data-tab="reimburse">Reimbursement</button>
+    <button class="tab-btn" data-tab="expense">Expense tracker</button>
     <button class="tab-btn" data-tab="grocery">Grocery</button>
     <button class="tab-btn" data-tab="ideas">Ideas</button>
   </div>
@@ -2223,9 +2222,14 @@
   </div>
 </div>
 
-<!-- ============ SPEND TRACKER TAB ============ -->
-<div class="tab-content" id="tab-spend">
-  <div class="data-shell">
+<!-- ============ EXPENSE TRACKER (wraps Spend + Reimbursement) ============ -->
+<div class="tab-content" id="tab-expense">
+  <div class="plan-subtabs">
+    <button class="plan-sub-btn active" data-expense-view="spend">Spend tracker</button>
+    <button class="plan-sub-btn" data-expense-view="reimburse">Reimbursement tracker</button>
+  </div>
+  <div class="expense-view expense-view-spend">
+    <div class="data-shell">
     <div class="data-toolbar">
       <h2 class="data-title">Spend tracker</h2>
       <div class="data-meta" id="spend-meta"></div>
@@ -2249,11 +2253,9 @@
       </div>
     </div>
   </div>
-</div>
-
-<!-- ============ REIMBURSEMENT TRACKER TAB ============ -->
-<div class="tab-content" id="tab-reimburse">
-  <div class="data-shell">
+  </div>
+  <div class="expense-view expense-view-reimburse" style="display:none;">
+    <div class="data-shell">
     <div class="data-toolbar">
       <h2 class="data-title">Reimbursement tracker</h2>
       <div class="data-meta" id="reimburse-meta"></div>
@@ -3884,7 +3886,7 @@ function renderActive() {
   if (!activeEl) return;
   const active = activeEl.dataset.tab;
   if (active === 'plan') renderPlan();
-  else if (active === 'spend' || active === 'reimburse') renderExpenses();
+  else if (active === 'expense') renderExpenseTab();
   else if (active === 'guests') renderGuests();
   else if (active === 'grocery') renderGrocery();
   else if (active === 'ideas') renderIdeas();
@@ -3903,11 +3905,30 @@ function renderPlan() {
   if (planView === 'weeks') renderWeeks();
   else if (planView === 'list') renderList();
 }
-document.querySelectorAll('.plan-sub-btn').forEach(b => {
+document.querySelectorAll('.plan-sub-btn[data-plan-view]').forEach(b => {
   b.addEventListener('click', () => {
     planView = b.dataset.planView;
     try { localStorage.setItem('bach-plan-view', planView); } catch(e) {}
     renderPlan();
+  });
+});
+
+let expenseView = 'spend';
+try { expenseView = localStorage.getItem('bach-expense-view') || 'spend'; } catch(e) {}
+function renderExpenseTab() {
+  document.querySelectorAll('.expense-view').forEach(v => {
+    v.style.display = v.classList.contains('expense-view-' + expenseView) ? '' : 'none';
+  });
+  document.querySelectorAll('.plan-sub-btn[data-expense-view]').forEach(b => {
+    b.classList.toggle('active', b.dataset.expenseView === expenseView);
+  });
+  renderExpenses();
+}
+document.querySelectorAll('.plan-sub-btn[data-expense-view]').forEach(b => {
+  b.addEventListener('click', () => {
+    expenseView = b.dataset.expenseView;
+    try { localStorage.setItem('bach-expense-view', expenseView); } catch(e) {}
+    renderExpenseTab();
   });
 });
 
