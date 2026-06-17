@@ -1447,18 +1447,25 @@
     border-top: 1px dashed var(--rule-soft);
     align-items: center;
   }
-  .gbc-add-row input, .gbc-add-row select {
-    border: 1px solid var(--rule);
+  .gbc-input, .gbc-entry .gbc-input, .gbc-add-row .gbc-input {
+    border: 1px solid var(--rule-soft);
     background: var(--bg-card);
-    padding: 5px 8px;
+    padding: 5px 9px;
     border-radius: 6px;
-    font-family: 'Manrope', sans-serif;
-    font-size: 12px;
+    font-family: 'Manrope', -apple-system, sans-serif;
+    font-size: 12.5px;
+    font-weight: 500;
     color: var(--ink);
     outline: none;
     width: 100%;
+    line-height: 1.3;
+    letter-spacing: 0;
   }
-  .gbc-add-row input:focus, .gbc-add-row select:focus { border-color: var(--clay); }
+  .gbc-input:hover, .gbc-entry .gbc-input:hover, .gbc-add-row .gbc-input:hover { border-color: var(--clay-soft); }
+  .gbc-input:focus, .gbc-entry .gbc-input:focus, .gbc-add-row .gbc-input:focus { border-color: var(--clay); background: white; }
+  .gbc-entry .gbe-amt-input { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .gbc-entry .gbe-note-input { font-style: normal; }
+  .gbc-entry .gbe-type-input, .gbc-entry .gbe-method-input { text-transform: none; letter-spacing: 0; }
   .gbc-add-btn {
     background: var(--clay); color: white;
     border: none; border-radius: 6px;
@@ -1597,34 +1604,41 @@
     font-family: 'Fraunces', serif; font-style: italic;
     color: var(--ink); font-size: 12px;
   }
-  .split-mode-toggle {
-    display: flex; align-items: center; gap: 8px;
-    padding: 10px 12px;
+  .split-bulk-btn {
+    background: var(--bg-card);
     border: 1px solid var(--rule);
-    border-radius: 8px;
-    margin-bottom: 8px;
-    cursor: pointer;
-    font-size: 13px;
+    border-radius: 100px;
+    padding: 5px 14px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--ink-soft); cursor: pointer;
+    transition: all 0.15s;
   }
-  .split-mode-toggle input { accent-color: var(--clay); }
-  .split-guests-list {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px;
-    padding: 10px;
+  .split-bulk-btn:hover { border-color: var(--clay); color: var(--clay); }
+  .split-pills {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    padding: 10px; border: 1px solid var(--rule); border-radius: 10px;
+    max-height: 280px; overflow-y: auto;
+  }
+  .split-pill {
+    display: inline-flex; align-items: center;
+    padding: 6px 14px;
     border: 1px solid var(--rule);
-    border-radius: 8px;
-    max-height: 280px;
-    overflow-y: auto;
-  }
-  .split-guest-row {
-    display: flex; align-items: center; gap: 8px;
-    padding: 6px 8px; border-radius: 4px;
+    border-radius: 100px;
+    background: var(--bg-card);
+    font-family: 'Manrope', sans-serif;
+    font-size: 12.5px; font-weight: 600;
+    color: var(--ink-faint);
     cursor: pointer;
-    font-size: 12.5px;
+    user-select: none;
+    transition: all 0.15s;
   }
-  .split-guest-row:hover { background: rgba(122,160,194,0.08); }
-  .split-guest-row input { accent-color: var(--clay); }
+  .split-pill:hover { border-color: var(--clay-soft); color: var(--clay); }
+  .split-pill.is-on {
+    background: var(--clay); color: white; border-color: var(--clay);
+    box-shadow: 0 1px 3px rgba(92,139,171,0.3);
+  }
+  .split-pill.is-on:hover { background: var(--plum); border-color: var(--plum); }
   .exp-status-btn {
     display: inline-block;
     font-size: 9.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
@@ -2475,22 +2489,16 @@
 <div class="modal-overlay" id="split-modal">
   <div class="modal">
     <h3 id="split-modal-title">Split this expense</h3>
-    <p style="font-size:12px; color:var(--ink-soft); margin-bottom:12px;">Choose who shares this cost. Per-person amount updates automatically.</p>
+    <p style="font-size:12px; color:var(--ink-soft); margin-bottom:12px;">Tap each person to include or exclude them from this cost.</p>
+    <div class="modal-row" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+      <button type="button" class="split-bulk-btn" onclick="setAllSplit(true)">Select all</button>
+      <button type="button" class="split-bulk-btn" onclick="setAllSplit(false)">Deselect all</button>
+      <span id="split-count-hint" style="margin-left:auto; font-size:12px; color:var(--ink-soft);"></span>
+    </div>
     <div class="modal-row">
-      <label class="split-mode-toggle">
-        <input type="radio" name="split-mode" value="even" id="split-mode-even" checked>
-        <span>Split evenly across all paying guests</span>
-      </label>
-      <label class="split-mode-toggle">
-        <input type="radio" name="split-mode" value="select" id="split-mode-select">
-        <span>Select specific people</span>
-      </label>
+      <div id="split-guests-list" class="split-pills"></div>
     </div>
-    <div class="modal-row" id="split-guests-row">
-      <label>Guests to include</label>
-      <div id="split-guests-list" class="split-guests-list"></div>
-    </div>
-    <div class="modal-row" id="split-preview" style="font-size:12px; color:var(--ink-soft);"></div>
+    <div class="modal-row" id="split-preview" style="font-size:13px; color:var(--ink); padding: 10px 14px; background: rgba(122,160,194,0.10); border-radius: 8px;"></div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeSplitModal()">Cancel</button>
       <button class="btn-save" onclick="saveSplit()">Save</button>
@@ -4828,43 +4836,48 @@ function openSplitModal(expenseId) {
   const e = state.expenses.items.find(x => x.id === expenseId);
   if (!e) return;
   document.getElementById('split-modal-title').textContent = 'Split — ' + (e.vendor || 'this expense');
-  const isCustom = e.splitMode === 'select';
-  document.getElementById('split-mode-even').checked = !isCustom;
-  document.getElementById('split-mode-select').checked = isCustom;
-  // Build guest list (paying guests only — bride excluded)
   const list = document.getElementById('split-guests-list');
   const allPaying = payingGuests();
-  const selected = new Set(Array.isArray(e.splitWith) ? e.splitWith : []);
+  const isCustom = e.splitMode === 'select';
+  const selected = new Set(
+    isCustom && Array.isArray(e.splitWith) && e.splitWith.length > 0
+      ? e.splitWith
+      : allPaying.map(g => g.id)
+  );
   list.innerHTML = allPaying.map(g => {
-    const checked = isCustom ? selected.has(g.id) : true;
+    const on = selected.has(g.id);
     const nameDisplay = `${escapeHTML(g.first||'')} ${escapeHTML((g.last||'').replace(/\(.*?\)/g,'').trim())}`;
-    return `<label class="split-guest-row">
-      <input type="checkbox" data-guest-id="${g.id}" ${checked?'checked':''} ${!isCustom?'disabled':''}>
-      <span>${nameDisplay}</span>
-    </label>`;
+    return `<button type="button" class="split-pill ${on?'is-on':''}" data-guest-id="${g.id}">${nameDisplay}</button>`;
   }).join('');
-  updateSplitPreview();
-  // Wire mode toggle
-  document.querySelectorAll('input[name="split-mode"]').forEach(r => {
-    r.onchange = () => {
-      const custom = document.getElementById('split-mode-select').checked;
-      list.querySelectorAll('input[type="checkbox"]').forEach(c => { c.disabled = !custom; if (!custom) c.checked = true; });
+  list.querySelectorAll('.split-pill').forEach(p => {
+    p.addEventListener('click', () => {
+      p.classList.toggle('is-on');
       updateSplitPreview();
-    };
+    });
   });
-  list.querySelectorAll('input[type="checkbox"]').forEach(c => c.addEventListener('change', updateSplitPreview));
+  updateSplitPreview();
   document.getElementById('split-modal').classList.add('active');
+}
+function setAllSplit(state) {
+  document.querySelectorAll('#split-guests-list .split-pill').forEach(p => {
+    p.classList.toggle('is-on', !!state);
+  });
+  updateSplitPreview();
 }
 function updateSplitPreview() {
   const e = state.expenses.items.find(x => x.id === splitModalExpenseId);
   if (!e) return;
-  const custom = document.getElementById('split-mode-select').checked;
-  const checked = [...document.querySelectorAll('#split-guests-list input[type="checkbox"]:checked')].map(c => c.dataset.guestId);
-  const ids = custom ? checked : payingGuests().map(g => g.id);
+  const onPills = document.querySelectorAll('#split-guests-list .split-pill.is-on');
+  const totalPills = document.querySelectorAll('#split-guests-list .split-pill').length;
+  const ids = [...onPills].map(p => p.dataset.guestId);
   const amt = Number(e.amount) || 0;
   const per = ids.length ? amt / ids.length : 0;
-  document.getElementById('split-preview').innerHTML =
-    `${fmtMoney(amt)} ÷ ${ids.length} ${ids.length===1?'person':'people'} = <b>${fmtMoney(per)} each</b>`;
+  const all = ids.length === totalPills;
+  document.getElementById('split-count-hint').textContent =
+    all ? `Everyone (${ids.length})` : `${ids.length} of ${totalPills} selected`;
+  document.getElementById('split-preview').innerHTML = ids.length
+    ? `<b>${fmtMoney(amt)}</b> ÷ ${ids.length} ${ids.length===1?'person':'people'} = <b>${fmtMoney(per)} each</b>`
+    : `<span style="color:var(--behind);">No one selected — pick at least one person.</span>`;
 }
 function closeSplitModal() {
   document.getElementById('split-modal').classList.remove('active');
@@ -4873,15 +4886,16 @@ function closeSplitModal() {
 function saveSplit() {
   const e = state.expenses.items.find(x => x.id === splitModalExpenseId);
   if (!e) { closeSplitModal(); return; }
-  const custom = document.getElementById('split-mode-select').checked;
-  if (custom) {
-    const ids = [...document.querySelectorAll('#split-guests-list input[type="checkbox"]:checked')].map(c => c.dataset.guestId);
-    if (ids.length === 0) { alert('Pick at least one person.'); return; }
-    e.splitMode = 'select';
-    e.splitWith = ids;
-  } else {
+  const onPills = document.querySelectorAll('#split-guests-list .split-pill.is-on');
+  const totalPills = document.querySelectorAll('#split-guests-list .split-pill').length;
+  const ids = [...onPills].map(p => p.dataset.guestId);
+  if (ids.length === 0) { alert('Pick at least one person.'); return; }
+  if (ids.length === totalPills) {
     e.splitMode = 'even';
     e.splitWith = [];
+  } else {
+    e.splitMode = 'select';
+    e.splitWith = ids;
   }
   persist();
   closeSplitModal();
