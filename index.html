@@ -2382,9 +2382,23 @@
     <div class="data-toolbar">
       <h2 class="data-title">Ideas</h2>
       <div class="data-meta" id="ideas-meta"></div>
+      <select id="idea-filter" onchange="renderIdeas()">
+        <option value="">All categories</option>
+      </select>
       <button class="data-add-btn" onclick="addIdeaRow()">+ Add idea</button>
     </div>
-    <div id="ideas-categories"></div>
+    <div class="exp-table-wrap">
+      <table class="exp-table gro-flat-table" id="ideas-table">
+        <thead><tr>
+          <th>Idea</th>
+          <th class="gro-cat-col">Category</th>
+          <th>Notes</th>
+          <th>Cost / Link</th>
+          <th class="gro-del-col"></th>
+        </tr></thead>
+        <tbody id="ideas-tbody"></tbody>
+      </table>
+    </div>
   </div>
 </div>
 
@@ -2948,72 +2962,79 @@ function addGuestRow() {
 // ----- IDEAS -----
 function renderIdeas() {
   ensureIdeasState();
-  const container = document.getElementById('ideas-categories');
-  container.innerHTML = '';
-  const cats = [...new Set([...IDEA_CATEGORIES, ...state.ideas.map(i => i.category).filter(Boolean)])];
-  cats.forEach(cat => {
-    const items = state.ideas.filter(i => (i.category||'Other') === cat);
-    if (cat === 'Other' && items.length === 0) return; // skip empty Other
-    const section = document.createElement('div');
-    section.className = 'data-section';
-    section.innerHTML = `
-      <div class="data-section-header">
-        <span class="data-section-name">${escapeHTML(cat)}</span>
-        <button class="data-section-add" data-cat="${escapeHTML(cat)}">+ Add idea</button>
-      </div>
-      <div class="data-table-wrap" style="border:none; box-shadow:none; border-radius:0;">
-        <table class="data-table">
-          <thead><tr>
-            <th>Idea</th><th>Notes</th><th>Cost / Link</th>
-            <th class="dt-actions"></th>
-          </tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
+  const items = state.ideas;
+  const allCats = [...new Set([...IDEA_CATEGORIES, ...items.map(i => i.category).filter(Boolean)])];
+  // Populate filter
+  const filterSel = document.getElementById('idea-filter');
+  if (filterSel) {
+    const cur = filterSel.value;
+    filterSel.innerHTML = '<option value="">All categories</option>' +
+      allCats.map(c => `<option value="${escapeHTML(c)}"${c===cur?' selected':''}>${escapeHTML(c)}</option>`).join('');
+  }
+  const filter = filterSel ? filterSel.value : '';
+  const tbody = document.getElementById('ideas-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  // Sort by category order then by idea name
+  const sorted = [...items].sort((a, b) => {
+    const ai = allCats.indexOf(a.category || 'Other');
+    const bi = allCats.indexOf(b.category || 'Other');
+    if (ai !== bi) return ai - bi;
+    return (a.idea||'').localeCompare(b.idea||'');
+  });
+  let lastCat = null;
+  for (const it of sorted) {
+    const cat = it.category || 'Other';
+    if (filter && cat !== filter) continue;
+    if (cat !== lastCat) {
+      lastCat = cat;
+      const count = items.filter(i => (i.category||'Other') === cat).length;
+      const headerTr = document.createElement('tr');
+      headerTr.className = 'gro-cat-header-row';
+      headerTr.innerHTML = `<td colspan="5"><span class="gro-cat-name">${escapeHTML(cat)}</span><span class="gro-cat-count">${count}</span></td>`;
+      tbody.appendChild(headerTr);
+    }
+    const tr = document.createElement('tr');
+    tr.className = 'gro-flat-row';
+    tr.dataset.id = it.id;
+    tr.innerHTML = `
+      <td><input type="text" class="exp-input idea" placeholder="Idea name" value="${escapeHTML(it.idea||'')}"></td>
+      <td class="gro-cat-col">
+        <select class="exp-input idea-cat">
+          ${allCats.map(c => `<option ${c===cat?'selected':''}>${escapeHTML(c)}</option>`).join('')}
+        </select>
+      </td>
+      <td><input type="text" class="exp-input idea-note" placeholder="Status note" value="${escapeHTML(it.note||'')}"></td>
+      <td><input type="text" class="exp-input idea-cost" placeholder="$ or URL" value="${escapeHTML(it.costLink||'')}"></td>
+      <td class="gro-del-col"><button class="exp-del-btn" title="Delete">×</button></td>
     `;
-    const tbody = section.querySelector('tbody');
-    items.forEach(it => {
-      const tr = document.createElement('tr');
-      tr.dataset.id = it.id;
-      tr.innerHTML = `
-        <td>${dataCellHTML(it.idea, 'idea', 'Idea name')}</td>
-        <td>${dataCellHTML(it.note, 'note', 'Status note')}</td>
-        <td>${dataCellHTML(it.costLink, 'costLink', '$ or URL')}</td>
-        <td class="dt-actions"><button class="data-del-btn" title="Delete">×</button></td>
-      `;
-      attachCellHandlers(tr, it);
-      tr.querySelector('.data-del-btn').addEventListener('click', () => {
-        if (!confirm('Remove this idea?')) return;
-        state.ideas = state.ideas.filter(x => x.id !== it.id);
-        persist();
-        renderIdeas();
-      });
-      tbody.appendChild(tr);
-    });
-    section.querySelector('.data-section-add').addEventListener('click', () => {
-      state.ideas.push({ id: uid(), category: cat, idea: '', note: '', costLink: '' });
+    tr.querySelector('.idea').addEventListener('change', e => { it.idea = e.target.value.trim(); persist(); });
+    tr.querySelector('.idea-cat').addEventListener('change', e => { it.category = e.target.value; persist(); renderIdeas(); });
+    tr.querySelector('.idea-note').addEventListener('change', e => { it.note = e.target.value.trim(); persist(); });
+    tr.querySelector('.idea-cost').addEventListener('change', e => { it.costLink = e.target.value.trim(); persist(); });
+    tr.querySelector('.exp-del-btn').addEventListener('click', () => {
+      if (!confirm('Remove this idea?')) return;
+      state.ideas = state.ideas.filter(x => x.id !== it.id);
       persist();
       renderIdeas();
-      setTimeout(() => {
-        // focus newly added (last in this section)
-        const allRows = document.querySelectorAll(`#tab-ideas .data-section`);
-        const matching = [...allRows].find(s => s.querySelector('.data-section-name').textContent === cat);
-        if (matching) {
-          const trs = matching.querySelectorAll('tbody tr');
-          const last = trs[trs.length - 1];
-          if (last) last.querySelector('[data-field="idea"]').focus();
-        }
-      }, 30);
     });
-    container.appendChild(section);
-  });
-  document.getElementById('ideas-meta').textContent = `${state.ideas.length} ideas across ${cats.filter(c => state.ideas.some(i => (i.category||'Other')===c)).length} categories`;
+    tbody.appendChild(tr);
+  }
+  const meta = document.getElementById('ideas-meta');
+  if (meta) {
+    const filledCats = allCats.filter(c => items.some(i => (i.category||'Other') === c)).length;
+    meta.textContent = `${items.length} ideas across ${filledCats} categor${filledCats===1?'y':'ies'}`;
+  }
 }
 function addIdeaRow() {
   ensureIdeasState();
   state.ideas.push({ id: uid(), category: IDEA_CATEGORIES[0], idea: '', note: '', costLink: '' });
   persist();
   renderIdeas();
+  setTimeout(() => {
+    const rows = document.querySelectorAll('#ideas-tbody .gro-flat-row');
+    if (rows.length) rows[rows.length - 1].querySelector('.idea').focus();
+  }, 30);
 }
 
 // ----- ITINERARY -----
