@@ -4306,7 +4306,8 @@ function ensureExpenseState() {
 }
 
 function isPayingGuest(g) {
-  return (g.rsvp || '').toLowerCase() === 'confirmed' && !g.nonPayer;
+  // Bride is included in splits by default; she can still be deselected per-expense
+  return (g.rsvp || '').toLowerCase() === 'confirmed';
 }
 
 function payingGuests() {
@@ -4512,16 +4513,14 @@ function renderReimburseCards() {
   (state.guests || []).forEach(g => {
     if ((g.rsvp||'').toLowerCase() === 'declined') return;
     const isBride = !!g.nonPayer;
-    const owed = isBride ? 0 : owedByGuest(g.id);
+    const owed = owedByGuest(g.id);
     const paid = paidByGuest(g.id);
     const balance = owed - paid; // positive = guest owes; negative = group owes guest
     const remaining = balance; // can be negative
     let statusKey, statusText;
-    if (isBride) { statusKey = 'is-bride'; statusText = 'Bride'; }
-    else if (balance < -0.5) { statusKey = 'is-paid'; statusText = `Group owes ${fmtMoney(Math.abs(balance))}`; }
+    if (balance < -0.5) { statusKey = 'is-paid'; statusText = `Group owes ${fmtMoney(Math.abs(balance))}`; }
     else if (paid >= owed && owed > 0) { statusKey = 'is-paid'; statusText = 'Paid in full'; }
     else if (paid > 0) { statusKey = 'is-partial'; statusText = 'Partial'; }
-    else if (owed === 0 && paid === 0) { statusKey = 'is-unpaid'; statusText = 'Not started'; }
     else { statusKey = 'is-unpaid'; statusText = 'Not started'; }
     const nameDisplay = `${escapeHTML(g.first||'')} ${escapeHTML((g.last||'').replace(/\(.*?\)/g,'').trim())}`;
     const card = document.createElement('div');
