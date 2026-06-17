@@ -3343,14 +3343,18 @@ async function initApp() {
   state.tasks.forEach(t => { if (t.week === 'beyond') t.week = 'w15'; });
   prepopulateCustomOwners();
   cloudReady = true;
-  applyWeekFilterButtons();
-  refreshOwnerFilters();
-  renderWeeks();
-  renderGantt();
-  updateAllCounters();
-  updateLastSaved();
-  updateImportMeta();
-  updateCountdowns();
+  try {
+    applyWeekFilterButtons();
+    refreshOwnerFilters();
+    renderWeeks();
+    renderGantt();
+    updateAllCounters();
+    updateLastSaved();
+    updateImportMeta();
+    updateCountdowns();
+  } catch (err) {
+    console.error('Render error during init:', err);
+  }
   if (!SCRIPT_URL) {
     updateSyncStatus('nocloud');
   } else if (!cloudHasTasks) {
