@@ -1346,6 +1346,100 @@
     border-radius: 8px;
     box-shadow: var(--shadow);
   }
+  /* ============ REIMBURSEMENT CARDS ============ */
+  #reimburse-cards { display: flex; flex-direction: column; gap: 12px; padding: 14px 18px; }
+  .gbc {
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    background: var(--bg-card);
+    overflow: hidden;
+  }
+  .gbc.is-paid { border-left: 4px solid var(--forest); }
+  .gbc.is-partial { border-left: 4px solid var(--clay); }
+  .gbc.is-unpaid { border-left: 4px solid var(--ink-faint); }
+  .gbc.is-bride { border-left: 4px solid #d0a778; opacity: 0.7; }
+  .gbc-header {
+    display: flex; align-items: center; gap: 16px;
+    padding: 12px 18px;
+    background: rgba(122,160,194,0.04);
+    border-bottom: 1px solid var(--rule-soft);
+    flex-wrap: wrap;
+  }
+  .gbc-name { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 500; color: var(--ink); flex: 1; min-width: 140px; letter-spacing: -0.01em; }
+  .gbc-amounts { display: flex; gap: 18px; font-size: 12px; flex-wrap: wrap; }
+  .gbc-amt { display: flex; flex-direction: column; align-items: flex-end; min-width: 64px; }
+  .gbc-amt-label { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); font-weight: 700; }
+  .gbc-amt-value { font-family: 'Fraunces', serif; font-size: 16px; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .gbc-amt-value.is-good { color: var(--forest); }
+  .gbc-amt-value.is-bad { color: var(--behind); }
+  .gbc-status { font-size: 9.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 10px; border-radius: 100px; }
+  .gbc-status.is-paid { background: rgba(74,142,149,0.16); color: var(--forest); }
+  .gbc-status.is-partial { background: rgba(122,160,194,0.16); color: var(--clay); }
+  .gbc-status.is-unpaid { background: rgba(133,151,168,0.16); color: var(--ink-faint); }
+  .gbc-status.is-bride { background: rgba(218,170,128,0.18); color: #a4661d; }
+  .gbc-entries { padding: 4px 0; }
+  .gbc-entry {
+    display: grid;
+    grid-template-columns: 90px 110px 110px 110px 1fr 36px;
+    gap: 8px;
+    padding: 8px 18px;
+    border-bottom: 1px solid var(--rule-soft);
+    align-items: center;
+    font-size: 12.5px;
+  }
+  .gbc-entry:last-child { border-bottom: none; }
+  .gbc-entry .gbe-amt { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); }
+  .gbc-entry .gbe-type { font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; padding: 3px 9px; border-radius: 100px; background: rgba(122,160,194,0.14); color: var(--clay); text-align: center; }
+  .gbc-entry .gbe-date, .gbc-entry .gbe-method { color: var(--ink-soft); }
+  .gbc-entry .gbe-note { color: var(--ink-soft); font-style: italic; }
+  .gbc-entry .gbe-del {
+    background: transparent; border: none; cursor: pointer; color: var(--ink-faint);
+    font-size: 15px; padding: 4px 6px; border-radius: 4px;
+  }
+  .gbc-entry .gbe-del:hover { color: var(--behind); background: rgba(214,85,62,0.08); }
+  .gbc-add-row {
+    display: grid;
+    grid-template-columns: 90px 110px 110px 110px 1fr 80px;
+    gap: 8px;
+    padding: 8px 18px;
+    background: rgba(122,160,194,0.04);
+    border-top: 1px dashed var(--rule-soft);
+    align-items: center;
+  }
+  .gbc-add-row input, .gbc-add-row select {
+    border: 1px solid var(--rule);
+    background: var(--bg-card);
+    padding: 5px 8px;
+    border-radius: 6px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 12px;
+    color: var(--ink);
+    outline: none;
+    width: 100%;
+  }
+  .gbc-add-row input:focus, .gbc-add-row select:focus { border-color: var(--clay); }
+  .gbc-add-btn {
+    background: var(--clay); color: white;
+    border: none; border-radius: 6px;
+    padding: 6px 10px;
+    font-family: 'Manrope', sans-serif; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    cursor: pointer;
+  }
+  .gbc-add-btn:hover { background: var(--plum); }
+  .gbc-empty { padding: 12px 18px; color: var(--ink-faint); font-style: italic; font-size: 12px; }
+  .gbc-bride-toggle {
+    background: transparent; border: 1px solid var(--rule); border-radius: 100px;
+    padding: 2px 8px; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--ink-faint); cursor: pointer;
+  }
+  .gbc-bride-toggle.active { background: rgba(218,170,128,0.18); color: #a4661d; border-color: #d0a778; }
+  @media (max-width: 700px) {
+    .gbc-entry, .gbc-add-row { grid-template-columns: 1fr 1fr; gap: 6px; padding: 8px 12px; }
+    .gbc-entry .gbe-note, .gbc-add-row .gbe-note { grid-column: 1 / -1; }
+    .gbc-amounts { gap: 10px; }
+  }
+
   /* ============ FLAT GROCERY TABLE ============ */
   .gro-flat-table { min-width: 720px; }
   .gro-flat-table .gro-got { width: 36px; text-align: center; }
@@ -2263,22 +2357,10 @@
     <div class="exp-summary" id="reimburse-summary"></div>
     <div class="exp-section">
       <div class="exp-section-header">
-        <h3>Who's paid what</h3>
-        <span class="exp-section-hint">Click a row to add or review payments</span>
+        <h3>Installment entries per guest</h3>
+        <span class="exp-section-hint">Add an entry every time someone pays you back</span>
       </div>
-      <div class="exp-table-wrap">
-        <table class="exp-table" id="bal-table">
-          <thead><tr>
-            <th>Guest</th>
-            <th class="exp-amt">Owed</th>
-            <th class="exp-amt">Paid</th>
-            <th class="exp-amt">Remaining</th>
-            <th class="exp-status">Status</th>
-            <th class="exp-pay">Payments</th>
-          </tr></thead>
-          <tbody id="bal-tbody"></tbody>
-        </table>
-      </div>
+      <div id="reimburse-cards"></div>
     </div>
   </div>
 </div>
@@ -4016,6 +4098,7 @@ function renderExpenses() {
   const reimburseMeta = document.getElementById('reimburse-meta'); if (reimburseMeta) reimburseMeta.textContent = `${fmtMoney(totalCollected)} collected of ${fmtMoney(perGuest * guests.length)} expected`;
 
   if (document.getElementById('exp-tbody')) renderExpenseRows();
+  if (document.getElementById('reimburse-cards')) renderReimburseCards();
   if (document.getElementById('bal-tbody')) renderBalances();
 }
 
@@ -4055,6 +4138,112 @@ function renderExpenseRows() {
       renderExpenses();
     });
     tbody.appendChild(tr);
+  });
+}
+
+function renderReimburseCards() {
+  const container = document.getElementById('reimburse-cards');
+  if (!container) return;
+  container.innerHTML = '';
+  const total = totalExpenses();
+  const guests = payingGuests();
+  const perGuest = guests.length ? total / guests.length : 0;
+  (state.guests || []).forEach(g => {
+    if ((g.rsvp||'').toLowerCase() === 'declined') return;
+    const isBride = !!g.nonPayer;
+    const owed = isBride ? 0 : perGuest;
+    const paid = paidByGuest(g.id);
+    const remaining = Math.max(0, owed - paid);
+    let statusKey, statusText;
+    if (isBride) { statusKey = 'is-bride'; statusText = 'Bride'; }
+    else if (paid >= owed && owed > 0) { statusKey = 'is-paid'; statusText = 'Paid in full'; }
+    else if (paid > 0) { statusKey = 'is-partial'; statusText = 'Partial'; }
+    else { statusKey = 'is-unpaid'; statusText = 'Not started'; }
+    const nameDisplay = `${escapeHTML(g.first||'')} ${escapeHTML((g.last||'').replace(/\(.*?\)/g,'').trim())}`;
+    const card = document.createElement('div');
+    card.className = 'gbc ' + statusKey;
+    const entries = paymentsForGuest(g.id);
+    const entriesHTML = entries.length
+      ? entries.map(p => `
+          <div class="gbc-entry" data-pid="${p.id}">
+            <span class="gbe-amt">${fmtMoney(p.amount)}</span>
+            <span class="gbe-type">${escapeHTML(p.type||'')}</span>
+            <span class="gbe-date">${escapeHTML(p.date||'')}</span>
+            <span class="gbe-method">${escapeHTML(p.method||'')}</span>
+            <span class="gbe-note">${escapeHTML(p.note||'')}</span>
+            <button class="gbe-del" data-pid="${p.id}" title="Delete">×</button>
+          </div>`).join('')
+      : `<div class="gbc-empty">No payments yet — add the first installment below.</div>`;
+    const addHTML = isBride ? '' : `
+      <div class="gbc-add-row">
+        <input type="text" class="gbc-input" data-f="amount" placeholder="$ Amount">
+        <select class="gbc-input" data-f="type">
+          <option value="deposit">Deposit</option>
+          <option value="interim">Interim</option>
+          <option value="final">Final</option>
+        </select>
+        <input type="date" class="gbc-input" data-f="date" value="${new Date().toISOString().slice(0,10)}">
+        <select class="gbc-input" data-f="method">
+          <option value="Venmo">Venmo</option>
+          <option value="Cash">Cash</option>
+          <option value="Zelle">Zelle</option>
+          <option value="Other">Other</option>
+        </select>
+        <input type="text" class="gbc-input gbe-note" data-f="note" placeholder="Memo (optional)">
+        <button class="gbc-add-btn" data-add-entry>+ Add</button>
+      </div>`;
+    card.innerHTML = `
+      <div class="gbc-header">
+        <div class="gbc-name">${nameDisplay}</div>
+        <button class="gbc-bride-toggle ${isBride?'active':''}" data-toggle-bride>${isBride ? '★ bride' : 'mark bride'}</button>
+        <div class="gbc-amounts">
+          <div class="gbc-amt"><span class="gbc-amt-label">Owed</span><span class="gbc-amt-value">${fmtMoney(owed)}</span></div>
+          <div class="gbc-amt"><span class="gbc-amt-label">Paid</span><span class="gbc-amt-value is-good">${fmtMoney(paid)}</span></div>
+          <div class="gbc-amt"><span class="gbc-amt-label">Remaining</span><span class="gbc-amt-value ${remaining>0?'is-bad':''}">${fmtMoney(remaining)}</span></div>
+        </div>
+        <span class="gbc-status ${statusKey}">${statusText}</span>
+      </div>
+      <div class="gbc-entries">${entriesHTML}</div>
+      ${addHTML}
+    `;
+    // Bride toggle
+    card.querySelector('[data-toggle-bride]').addEventListener('click', () => {
+      g.nonPayer = !g.nonPayer;
+      persist();
+      renderExpenses();
+    });
+    // Delete entry
+    card.querySelectorAll('.gbe-del').forEach(b => {
+      b.addEventListener('click', () => {
+        const pid = b.dataset.pid;
+        if (!confirm('Delete this entry?')) return;
+        state.payments = state.payments.filter(p => p.id !== pid);
+        persist();
+        renderExpenses();
+      });
+    });
+    // Inline add
+    const addBtn = card.querySelector('[data-add-entry]');
+    if (addBtn) {
+      addBtn.addEventListener('click', () => {
+        const inputs = card.querySelectorAll('.gbc-input');
+        const vals = {};
+        inputs.forEach(i => vals[i.dataset.f] = i.value);
+        const amount = parseMoney(vals.amount);
+        if (!amount || amount <= 0) { alert('Enter an amount.'); return; }
+        state.payments = state.payments || [];
+        state.payments.push({
+          id: uid(), guestId: g.id, amount,
+          type: vals.type || 'deposit',
+          date: vals.date || new Date().toISOString().slice(0,10),
+          method: vals.method || 'Venmo',
+          note: (vals.note || '').trim()
+        });
+        persist();
+        renderExpenses();
+      });
+    }
+    container.appendChild(card);
   });
 }
 
