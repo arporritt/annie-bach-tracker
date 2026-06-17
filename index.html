@@ -342,7 +342,7 @@
     .group-bar-inner { padding: 8px 14px 0; gap: 4px; }
     .group-tab { padding: 8px 14px; font-size: 10px; letter-spacing: 0.1em; }
   }
-  .tab-btn[data-group]:not(.in-group) { display: none; }
+  .group-bar { display: none; }
   .tab-bar {
     position: sticky; top: 70px; z-index: 50;
     background: rgba(238,243,246,0.92);
@@ -1947,13 +1947,6 @@
 </div>
 
 <!-- ============ TABS ============ -->
-<div class="group-bar">
-  <div class="group-bar-inner">
-    <button class="group-tab active" data-group="plan">Project Plan</button>
-    <button class="group-tab" data-group="budget">Budget</button>
-    <button class="group-tab" data-group="design">Guest List</button>
-  </div>
-</div>
 <div class="tab-bar">
   <div class="tab-bar-inner">
     <button class="tab-btn active" data-tab="weeks" data-group="plan">Week-by-week</button>
@@ -2175,7 +2168,26 @@
     <div class="exp-summary" id="exp-summary"></div>
     <div class="exp-section">
       <div class="exp-section-header">
-        <h3>Expenses paid out</h3>
+        <h3>Who's paid what</h3>
+        <span class="exp-section-hint">Click a row to add or review payments</span>
+      </div>
+      <div class="exp-table-wrap">
+        <table class="exp-table" id="bal-table">
+          <thead><tr>
+            <th>Guest</th>
+            <th class="exp-amt">Owed</th>
+            <th class="exp-amt">Paid</th>
+            <th class="exp-amt">Remaining</th>
+            <th class="exp-status">Status</th>
+            <th class="exp-pay">Payments</th>
+          </tr></thead>
+          <tbody id="bal-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="exp-section">
+      <div class="exp-section-header">
+        <h3>Expenses paid out <span class="exp-section-hint" style="margin-left: 8px;">(reference — totals up to per-guest share)</span></h3>
         <button class="data-add-btn" onclick="addExpense()">+ Add expense</button>
       </div>
       <div class="exp-table-wrap">
@@ -2190,25 +2202,6 @@
             <th class="exp-del"></th>
           </tr></thead>
           <tbody id="exp-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-    <div class="exp-section">
-      <div class="exp-section-header">
-        <h3>Guest balances</h3>
-        <span class="exp-section-hint">Click a row to add a payment</span>
-      </div>
-      <div class="exp-table-wrap">
-        <table class="exp-table" id="bal-table">
-          <thead><tr>
-            <th>Guest</th>
-            <th class="exp-amt">Owed</th>
-            <th class="exp-amt">Paid</th>
-            <th class="exp-amt">Remaining</th>
-            <th class="exp-status">Status</th>
-            <th class="exp-pay">Payments</th>
-          </tr></thead>
-          <tbody id="bal-tbody"></tbody>
         </table>
       </div>
     </div>
@@ -4425,34 +4418,6 @@ function jumpToCurrentWeek() {
   }, 80);
 }
 
-function activateGroup(group, preferredTab) {
-  // Mark group active
-  document.querySelectorAll('.group-tab').forEach(g => g.classList.toggle('active', g.dataset.group === group));
-  // Show only sub-tabs in this group
-  const subBtns = document.querySelectorAll('.tab-btn[data-group]');
-  subBtns.forEach(b => {
-    const inGroup = b.dataset.group === group;
-    b.classList.toggle('in-group', inGroup);
-    b.classList.toggle('active', false);
-  });
-  // Pick the active sub-tab
-  const inGroupBtns = [...document.querySelectorAll('.tab-btn.in-group')];
-  let target = preferredTab && inGroupBtns.find(b => b.dataset.tab === preferredTab);
-  if (!target) target = inGroupBtns[0];
-  if (target) {
-    target.classList.add('active');
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    const c = document.getElementById('tab-' + target.dataset.tab);
-    if (c) c.classList.add('active');
-    renderActive();
-  }
-  try { localStorage.setItem('bach-group', group); } catch(e) {}
-}
-
-document.querySelectorAll('.group-tab').forEach(gt => {
-  gt.addEventListener('click', () => activateGroup(gt.dataset.group));
-});
-
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -4462,13 +4427,6 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     renderActive();
   });
 });
-
-// Initialize group on load
-(function initGroups(){
-  let g = 'plan';
-  try { g = localStorage.getItem('bach-group') || 'plan'; } catch(e) {}
-  activateGroup(g);
-})();
 
 // ============================================================
 // LIST CONTROLS
