@@ -1582,6 +1582,49 @@
   .exp-table .exp-date { width: 110px; }
   .exp-table .exp-del { width: 36px; }
   .exp-table .exp-status { width: 110px; }
+  .exp-table .exp-split { width: 130px; }
+  .exp-split-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.04em;
+    padding: 4px 10px; border-radius: 100px;
+    border: 1px solid var(--rule); background: var(--bg-card);
+    cursor: pointer;
+    color: var(--ink-soft);
+  }
+  .exp-split-btn:hover { border-color: var(--clay); color: var(--clay); }
+  .exp-split-btn.is-custom { background: rgba(122,160,194,0.18); border-color: var(--clay-soft); color: var(--clay); }
+  .exp-split-btn .split-count {
+    font-family: 'Fraunces', serif; font-style: italic;
+    color: var(--ink); font-size: 12px;
+  }
+  .split-mode-toggle {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 12px;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .split-mode-toggle input { accent-color: var(--clay); }
+  .split-guests-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    padding: 10px;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    max-height: 280px;
+    overflow-y: auto;
+  }
+  .split-guest-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 8px; border-radius: 4px;
+    cursor: pointer;
+    font-size: 12.5px;
+  }
+  .split-guest-row:hover { background: rgba(122,160,194,0.08); }
+  .split-guest-row input { accent-color: var(--clay); }
   .exp-status-btn {
     display: inline-block;
     font-size: 9.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
@@ -2391,6 +2434,7 @@
             <th class="exp-amt">Amount</th>
             <th class="exp-by">Paid by</th>
             <th class="exp-status">Status</th>
+            <th class="exp-split">Split</th>
             <th>Note</th>
             <th class="exp-del"></th>
           </tr></thead>
@@ -2413,6 +2457,33 @@
         <span class="exp-section-hint">Add an entry every time someone pays you back</span>
       </div>
       <div id="reimburse-cards"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SPLIT MODAL ============ -->
+<div class="modal-overlay" id="split-modal">
+  <div class="modal">
+    <h3 id="split-modal-title">Split this expense</h3>
+    <p style="font-size:12px; color:var(--ink-soft); margin-bottom:12px;">Choose who shares this cost. Per-person amount updates automatically.</p>
+    <div class="modal-row">
+      <label class="split-mode-toggle">
+        <input type="radio" name="split-mode" value="even" id="split-mode-even" checked>
+        <span>Split evenly across all paying guests</span>
+      </label>
+      <label class="split-mode-toggle">
+        <input type="radio" name="split-mode" value="select" id="split-mode-select">
+        <span>Select specific people</span>
+      </label>
+    </div>
+    <div class="modal-row" id="split-guests-row">
+      <label>Guests to include</label>
+      <div id="split-guests-list" class="split-guests-list"></div>
+    </div>
+    <div class="modal-row" id="split-preview" style="font-size:12px; color:var(--ink-soft);"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeSplitModal()">Cancel</button>
+      <button class="btn-save" onclick="saveSplit()">Save</button>
     </div>
   </div>
 </div>
@@ -4198,6 +4269,11 @@ function ensureExpenseState() {
     state.expenses = { items: SEED_EXPENSES.map(e => ({ id: uid(), ...e })) };
   }
   if (!Array.isArray(state.payments)) state.payments = [];
+  // Migrate: ensure each expense has splitMode/splitWith
+  (state.expenses.items || []).forEach(e => {
+    if (!e.splitMode) e.splitMode = 'even';
+    if (!Array.isArray(e.splitWith)) e.splitWith = [];
+  });
   // Default-mark the bride (Annie Porritt) as nonPayer if no one is marked yet
   if (Array.isArray(state.guests) && !state.guests.some(g => g.nonPayer)) {
     const bride = state.guests.find(g =>
@@ -4218,6 +4294,32 @@ function payingGuests() {
 
 function totalExpenses() {
   return (state.expenses?.items || []).reduce((s, e) => s + (Number(e.amount) || 0), 0);
+}
+
+function splitParticipantIds(exp) {
+  const allPaying = payingGuests().map(g => g.id);
+  if (exp.splitMode === 'select' && Array.isArray(exp.splitWith) && exp.splitWith.length > 0) {
+    return exp.splitWith.filter(id => allPaying.includes(id));
+  }
+  return allPaying;
+}
+
+function owedByGuest(guestId) {
+  return (state.expenses?.items || []).reduce((s, e) => {
+    const split = splitParticipantIds(e);
+    if (!split.includes(guestId) || split.length === 0) return s;
+    return s + (Number(e.amount) || 0) / split.length;
+  }, 0);
+}
+
+function renderSplitChip(e) {
+  const split = splitParticipantIds(e);
+  const isCustom = e.splitMode === 'select' && Array.isArray(e.splitWith) && e.splitWith.length > 0;
+  const perPerson = split.length ? (Number(e.amount) || 0) / split.length : 0;
+  const label = isCustom ? `Custom (${split.length})` : `Even (${split.length})`;
+  return `<button class="exp-split-btn ${isCustom ? 'is-custom' : ''}" data-split-btn data-expense-id="${e.id}">
+    ${label} <span class="split-count">${fmtMoney(perPerson)}</span>
+  </button>`;
 }
 
 function paymentsForGuest(guestId) {
@@ -4312,6 +4414,7 @@ function renderExpenseRows() {
       <td><input class="exp-input amount" data-f="amount" value="${e.amount ? fmtMoney(e.amount) : ''}" placeholder="—"></td>
       <td><input class="exp-input" data-f="paidBy" value="${escapeHTML(e.paidBy||'')}" placeholder="Allie"></td>
       <td><button class="exp-status-btn ${e.paid ? 'is-paid' : 'is-pending'}" data-f="paid">${e.paid ? '✓ Paid' : 'Pending'}</button></td>
+      <td>${renderSplitChip(e)}</td>
       <td><input class="exp-input" data-f="note" value="${escapeHTML(e.note||'')}" placeholder="—"></td>
       <td><button class="exp-del-btn" title="Delete">×</button></td>
     `;
@@ -4334,6 +4437,8 @@ function renderExpenseRows() {
         renderExpenses();
       });
     }
+    const splitBtn = tr.querySelector('[data-split-btn]');
+    if (splitBtn) splitBtn.addEventListener('click', () => openSplitModal(e.id));
     tr.querySelector('.exp-del-btn').addEventListener('click', () => {
       if (!confirm('Delete this expense?')) return;
       state.expenses.items = state.expenses.items.filter(i => i.id !== e.id);
@@ -4348,13 +4453,10 @@ function renderReimburseCards() {
   const container = document.getElementById('reimburse-cards');
   if (!container) return;
   container.innerHTML = '';
-  const total = totalExpenses();
-  const guests = payingGuests();
-  const perGuest = guests.length ? total / guests.length : 0;
   (state.guests || []).forEach(g => {
     if ((g.rsvp||'').toLowerCase() === 'declined') return;
     const isBride = !!g.nonPayer;
-    const owed = isBride ? 0 : perGuest;
+    const owed = isBride ? 0 : owedByGuest(g.id);
     const paid = paidByGuest(g.id);
     const remaining = Math.max(0, owed - paid);
     let statusKey, statusText;
@@ -4668,6 +4770,73 @@ function addExpense() {
     if (inputs.length) inputs[0].focus();
   }, 0);
 }
+
+let splitModalExpenseId = null;
+function openSplitModal(expenseId) {
+  splitModalExpenseId = expenseId;
+  const e = state.expenses.items.find(x => x.id === expenseId);
+  if (!e) return;
+  document.getElementById('split-modal-title').textContent = 'Split — ' + (e.vendor || 'this expense');
+  const isCustom = e.splitMode === 'select';
+  document.getElementById('split-mode-even').checked = !isCustom;
+  document.getElementById('split-mode-select').checked = isCustom;
+  // Build guest list (paying guests only — bride excluded)
+  const list = document.getElementById('split-guests-list');
+  const allPaying = payingGuests();
+  const selected = new Set(Array.isArray(e.splitWith) ? e.splitWith : []);
+  list.innerHTML = allPaying.map(g => {
+    const checked = isCustom ? selected.has(g.id) : true;
+    const nameDisplay = `${escapeHTML(g.first||'')} ${escapeHTML((g.last||'').replace(/\(.*?\)/g,'').trim())}`;
+    return `<label class="split-guest-row">
+      <input type="checkbox" data-guest-id="${g.id}" ${checked?'checked':''} ${!isCustom?'disabled':''}>
+      <span>${nameDisplay}</span>
+    </label>`;
+  }).join('');
+  updateSplitPreview();
+  // Wire mode toggle
+  document.querySelectorAll('input[name="split-mode"]').forEach(r => {
+    r.onchange = () => {
+      const custom = document.getElementById('split-mode-select').checked;
+      list.querySelectorAll('input[type="checkbox"]').forEach(c => { c.disabled = !custom; if (!custom) c.checked = true; });
+      updateSplitPreview();
+    };
+  });
+  list.querySelectorAll('input[type="checkbox"]').forEach(c => c.addEventListener('change', updateSplitPreview));
+  document.getElementById('split-modal').classList.add('active');
+}
+function updateSplitPreview() {
+  const e = state.expenses.items.find(x => x.id === splitModalExpenseId);
+  if (!e) return;
+  const custom = document.getElementById('split-mode-select').checked;
+  const checked = [...document.querySelectorAll('#split-guests-list input[type="checkbox"]:checked')].map(c => c.dataset.guestId);
+  const ids = custom ? checked : payingGuests().map(g => g.id);
+  const amt = Number(e.amount) || 0;
+  const per = ids.length ? amt / ids.length : 0;
+  document.getElementById('split-preview').innerHTML =
+    `${fmtMoney(amt)} ÷ ${ids.length} ${ids.length===1?'person':'people'} = <b>${fmtMoney(per)} each</b>`;
+}
+function closeSplitModal() {
+  document.getElementById('split-modal').classList.remove('active');
+  splitModalExpenseId = null;
+}
+function saveSplit() {
+  const e = state.expenses.items.find(x => x.id === splitModalExpenseId);
+  if (!e) { closeSplitModal(); return; }
+  const custom = document.getElementById('split-mode-select').checked;
+  if (custom) {
+    const ids = [...document.querySelectorAll('#split-guests-list input[type="checkbox"]:checked')].map(c => c.dataset.guestId);
+    if (ids.length === 0) { alert('Pick at least one person.'); return; }
+    e.splitMode = 'select';
+    e.splitWith = ids;
+  } else {
+    e.splitMode = 'even';
+    e.splitWith = [];
+  }
+  persist();
+  closeSplitModal();
+  renderExpenses();
+}
+document.getElementById('split-modal').addEventListener('click', e => { if (e.target.id === 'split-modal') closeSplitModal(); });
 
 let payModalGuestId = null;
 function openPayModal(g) {
