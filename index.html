@@ -1589,14 +1589,15 @@
   .exp-table .exp-date { width: 110px; }
   .exp-table .exp-del { width: 36px; }
   .exp-table .exp-status { width: 110px; }
-  .exp-table .exp-split { width: 130px; }
+  .exp-table .exp-split { min-width: 160px; }
   .exp-split-btn {
-    display: inline-flex; align-items: center; gap: 6px;
+    display: inline-flex; align-items: center; gap: 8px;
     font-size: 11px; font-weight: 600; letter-spacing: 0.04em;
-    padding: 4px 10px; border-radius: 100px;
+    padding: 4px 12px; border-radius: 100px;
     border: 1px solid var(--rule); background: var(--bg-card);
     cursor: pointer;
     color: var(--ink-soft);
+    white-space: nowrap;
   }
   .exp-split-btn:hover { border-color: var(--clay); color: var(--clay); }
   .exp-split-btn.is-custom { background: rgba(122,160,194,0.18); border-color: var(--clay-soft); color: var(--clay); }
@@ -2156,24 +2157,6 @@
 </header>
 
 <!-- ============ META ROW ============ -->
-<div class="meta-row">
-  <div class="meta-cell">
-    <div class="meta-label">RSVP Deadline</div>
-    <div class="meta-value">Jun 7 <span class="small">Sun</span></div>
-    <div class="meta-countdown" data-date="2026-06-07">…</div>
-  </div>
-  <div class="meta-cell">
-    <div class="meta-label">Final Headcount</div>
-    <div class="meta-value">Jul 12 <span class="small">Sun</span></div>
-    <div class="meta-countdown" data-date="2026-07-12">…</div>
-  </div>
-  <div class="meta-cell">
-    <div class="meta-label">Bach Weekend</div>
-    <div class="meta-value">Jul 24 <span class="small">Fri</span></div>
-    <div class="meta-countdown" data-date="2026-07-24">…</div>
-  </div>
-  <div class="meta-cell"><div class="meta-label">Total Tasks</div><div class="meta-value" id="total-tasks">47</div></div>
-</div>
 
 <!-- ============ GANTT STRIP ============ -->
 <div class="gantt-wrap">
