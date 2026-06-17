@@ -1346,6 +1346,23 @@
     border-radius: 8px;
     box-shadow: var(--shadow);
   }
+  /* ============ COLUMN RESIZE ============ */
+  .resizable-table thead th { position: relative; }
+  .col-resize-grip {
+    position: absolute;
+    right: -2px; top: 0; bottom: 0;
+    width: 6px;
+    cursor: col-resize;
+    user-select: none;
+    z-index: 3;
+    background: transparent;
+  }
+  .col-resize-grip:hover, .col-resize-grip.is-resizing {
+    background: linear-gradient(90deg, transparent 40%, var(--clay) 40%, var(--clay) 60%, transparent 60%);
+  }
+  body.is-col-resizing { cursor: col-resize !important; user-select: none; }
+  body.is-col-resizing * { cursor: col-resize !important; }
+
   /* ============ ITINERARY DRAG-AND-DROP ============ */
   .itin-drag-col { width: 22px; }
   .itin-drag, .exp-drag {
@@ -4075,6 +4092,43 @@ document.addEventListener('keydown', e => {
 // ============================================================
 // TABS
 // ============================================================
+function initColResize() {
+  const tables = document.querySelectorAll('.guests-table, .exp-table, .gro-flat-table, .list-table, .data-table');
+  tables.forEach(table => {
+    if (!table.classList.contains('resizable-table')) table.classList.add('resizable-table');
+    const tableId = table.id || (table.className.split(/\s+/).find(c => c.endsWith('-table')) || 'tbl');
+    table.querySelectorAll('thead th').forEach((th, idx) => {
+      if (th.querySelector('.col-resize-grip')) return;
+      const savedWidth = localStorage.getItem('colw-' + tableId + '-' + idx);
+      if (savedWidth) { th.style.width = savedWidth + 'px'; th.style.minWidth = savedWidth + 'px'; }
+      const grip = document.createElement('span');
+      grip.className = 'col-resize-grip';
+      grip.addEventListener('mousedown', (e) => {
+        e.preventDefault(); e.stopPropagation();
+        const startX = e.clientX;
+        const startWidth = th.offsetWidth;
+        grip.classList.add('is-resizing');
+        document.body.classList.add('is-col-resizing');
+        function move(ev) {
+          const w = Math.max(40, startWidth + (ev.clientX - startX));
+          th.style.width = w + 'px';
+          th.style.minWidth = w + 'px';
+        }
+        function up() {
+          document.removeEventListener('mousemove', move);
+          document.removeEventListener('mouseup', up);
+          grip.classList.remove('is-resizing');
+          document.body.classList.remove('is-col-resizing');
+          try { localStorage.setItem('colw-' + tableId + '-' + idx, th.offsetWidth); } catch(_) {}
+        }
+        document.addEventListener('mousemove', move);
+        document.addEventListener('mouseup', up);
+      });
+      th.appendChild(grip);
+    });
+  });
+}
+
 function renderActive() {
   const activeEl = document.querySelector('.tab-btn.active');
   if (!activeEl) return;
@@ -4085,6 +4139,7 @@ function renderActive() {
   else if (active === 'grocery') renderGrocery();
   else if (active === 'ideas') renderIdeas();
   else if (active === 'itinerary') renderItinerary();
+  setTimeout(initColResize, 0);
 }
 
 let planView = 'weeks';
@@ -4314,11 +4369,20 @@ function renderReimburseCards() {
     const entriesHTML = entries.length
       ? entries.map(p => `
           <div class="gbc-entry" data-pid="${p.id}">
-            <span class="gbe-amt">${fmtMoney(p.amount)}</span>
-            <span class="gbe-type">${escapeHTML(p.type||'')}</span>
-            <span class="gbe-date">${escapeHTML(p.date||'')}</span>
-            <span class="gbe-method">${escapeHTML(p.method||'')}</span>
-            <span class="gbe-note">${escapeHTML(p.note||'')}</span>
+            <input type="text" class="gbc-input gbe-amt-input" data-pf="amount" data-pid="${p.id}" value="${p.amount ? fmtMoney(p.amount) : ''}" placeholder="$0">
+            <select class="gbc-input gbe-type-input" data-pf="type" data-pid="${p.id}">
+              <option value="deposit"${p.type==='deposit'?' selected':''}>Deposit</option>
+              <option value="interim"${p.type==='interim'?' selected':''}>Interim</option>
+              <option value="final"${p.type==='final'?' selected':''}>Final</option>
+            </select>
+            <input type="date" class="gbc-input gbe-date-input" data-pf="date" data-pid="${p.id}" value="${escapeHTML(p.date||'')}">
+            <select class="gbc-input gbe-method-input" data-pf="method" data-pid="${p.id}">
+              <option value="Venmo"${p.method==='Venmo'?' selected':''}>Venmo</option>
+              <option value="Cash"${p.method==='Cash'?' selected':''}>Cash</option>
+              <option value="Zelle"${p.method==='Zelle'?' selected':''}>Zelle</option>
+              <option value="Other"${p.method==='Other'?' selected':''}>Other</option>
+            </select>
+            <input type="text" class="gbc-input gbe-note-input" data-pf="note" data-pid="${p.id}" value="${escapeHTML(p.note||'')}" placeholder="Memo">
             <button class="gbe-del" data-pid="${p.id}" title="Delete">×</button>
           </div>`).join('')
       : `<div class="gbc-empty">No payments yet — add the first installment below.</div>`;
@@ -4375,6 +4439,24 @@ function renderReimburseCards() {
       const pid = rowEl.dataset.pid;
       const pay = state.payments.find(p => p.id === pid);
       if (pay) attachEntryDnD(rowEl, pay, g.id);
+    });
+    // Edit existing entry fields inline
+    card.querySelectorAll('.gbc-entry .gbc-input').forEach(inp => {
+      inp.addEventListener('change', () => {
+        const pid = inp.dataset.pid;
+        const pf = inp.dataset.pf;
+        const pay = state.payments.find(p => p.id === pid);
+        if (!pay) return;
+        if (pf === 'amount') {
+          const v = parseMoney(inp.value);
+          if (v <= 0) { inp.value = pay.amount ? fmtMoney(pay.amount) : ''; return; }
+          pay.amount = v;
+        } else {
+          pay[pf] = inp.value.trim();
+        }
+        persist();
+        renderExpenses();
+      });
     });
     // Inline add
     const addBtn = card.querySelector('[data-add-entry]');
