@@ -1346,6 +1346,21 @@
     border-radius: 8px;
     box-shadow: var(--shadow);
   }
+  /* ============ ITINERARY DRAG-AND-DROP ============ */
+  .itin-drag-col { width: 22px; }
+  .itin-drag {
+    cursor: grab; color: var(--ink-faint);
+    text-align: center;
+    font-size: 12px;
+    letter-spacing: -2px;
+    user-select: none;
+    padding-right: 2px !important;
+  }
+  .itin-drag:active { cursor: grabbing; }
+  tr.itin-dragging { opacity: 0.35; }
+  tr.itin-over-top td { box-shadow: 0 -2px 0 0 var(--clay) inset; }
+  tr.itin-over-bottom td { box-shadow: 0 2px 0 0 var(--clay) inset; }
+
   /* ============ REIMBURSEMENT CARDS ============ */
   #reimburse-cards { display: flex; flex-direction: column; gap: 12px; padding: 14px 18px; }
   .gbc {
@@ -2911,6 +2926,7 @@ function renderItinerary() {
       <div class="data-table-wrap" style="border:none; box-shadow:none; border-radius:0;">
         <table class="data-table">
           <thead><tr>
+            <th class="itin-drag-col"></th>
             <th style="width:90px;">Start</th><th style="width:90px;">End</th>
             <th>Activity</th><th>Notes</th>
             <th class="dt-actions"></th>
@@ -2919,11 +2935,14 @@ function renderItinerary() {
         </table>
       </div>
     `;
+    section.dataset.day = day;
     const tbody = section.querySelector('tbody');
     items.forEach(it => {
       const tr = document.createElement('tr');
       tr.dataset.id = it.id;
+      tr.draggable = true;
       tr.innerHTML = `
+        <td class="itin-drag" title="Drag to reorder">⋮⋮</td>
         <td>${dataCellHTML(it.start, 'start', '—')}</td>
         <td>${dataCellHTML(it.end, 'end', '—')}</td>
         <td>${dataCellHTML(it.activity, 'activity', 'Activity')}</td>
@@ -2937,7 +2956,28 @@ function renderItinerary() {
         persist();
         renderItinerary();
       });
+      attachItinDnD(tr, it);
       tbody.appendChild(tr);
+    });
+    // Whole day section accepts drops to allow moving an item to a different day
+    section.addEventListener('dragover', e => {
+      if (!draggedItinId) return;
+      e.preventDefault();
+    });
+    section.addEventListener('drop', e => {
+      if (!draggedItinId) return;
+      e.preventDefault();
+      if (e.target.closest('tr[data-id]')) return; // handled by row drop
+      const dragged = state.itinerary.find(x => x.id === draggedItinId);
+      if (!dragged) return;
+      if (dragged.day !== day) {
+        dragged.day = day;
+        // Move to end of new day
+        state.itinerary = state.itinerary.filter(x => x.id !== draggedItinId);
+        state.itinerary.push(dragged);
+        persist();
+        renderItinerary();
+      }
     });
     section.querySelector('.data-section-add').addEventListener('click', () => {
       state.itinerary.push({ id: uid(), day: day, start: '', end: '', activity: '', note: '' });
@@ -2946,6 +2986,58 @@ function renderItinerary() {
     });
     container.appendChild(section);
   });
+}
+
+let draggedItinId = null;
+function attachItinDnD(tr, it) {
+  // Only start drag from the drag handle, not editable cells
+  tr.addEventListener('dragstart', e => {
+    if (e.target.closest('[contenteditable="true"]')) { e.preventDefault(); return; }
+    draggedItinId = it.id;
+    e.dataTransfer.effectAllowed = 'move';
+    try { e.dataTransfer.setData('text/plain', it.id); } catch(_) {}
+    tr.classList.add('itin-dragging');
+  });
+  tr.addEventListener('dragend', () => {
+    tr.classList.remove('itin-dragging');
+    document.querySelectorAll('.itin-over-top,.itin-over-bottom')
+      .forEach(el => el.classList.remove('itin-over-top','itin-over-bottom'));
+    draggedItinId = null;
+  });
+  tr.addEventListener('dragover', e => {
+    if (!draggedItinId || draggedItinId === it.id) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    const rect = tr.getBoundingClientRect();
+    const below = (e.clientY - rect.top) > rect.height / 2;
+    tr.classList.toggle('itin-over-top', !below);
+    tr.classList.toggle('itin-over-bottom', below);
+  });
+  tr.addEventListener('dragleave', () => {
+    tr.classList.remove('itin-over-top','itin-over-bottom');
+  });
+  tr.addEventListener('drop', e => {
+    if (!draggedItinId || draggedItinId === it.id) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const below = tr.classList.contains('itin-over-bottom');
+    tr.classList.remove('itin-over-top','itin-over-bottom');
+    moveItinTo(draggedItinId, it.id, below ? 'after' : 'before');
+  });
+}
+
+function moveItinTo(srcId, dstId, pos) {
+  const srcIdx = state.itinerary.findIndex(x => x.id === srcId);
+  if (srcIdx < 0) return;
+  const [src] = state.itinerary.splice(srcIdx, 1);
+  const dstIdxNow = state.itinerary.findIndex(x => x.id === dstId);
+  if (dstIdxNow < 0) { state.itinerary.splice(srcIdx, 0, src); return; }
+  // Inherit destination's day so cross-day drags work
+  src.day = state.itinerary[dstIdxNow].day;
+  const insertAt = pos === 'after' ? dstIdxNow + 1 : dstIdxNow;
+  state.itinerary.splice(insertAt, 0, src);
+  persist();
+  renderItinerary();
 }
 
 
