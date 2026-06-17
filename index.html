@@ -4277,7 +4277,7 @@ function renderReimburseCards() {
             <button class="gbe-del" data-pid="${p.id}" title="Delete">×</button>
           </div>`).join('')
       : `<div class="gbc-empty">No payments yet — add the first installment below.</div>`;
-    const addHTML = isBride ? '' : `
+    const addHTML = `
       <div class="gbc-add-row">
         <input type="text" class="gbc-input" data-f="amount" placeholder="$ Amount">
         <select class="gbc-input" data-f="type">
