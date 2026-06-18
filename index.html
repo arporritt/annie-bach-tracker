@@ -1420,7 +1420,7 @@
   .gbc-entries { padding: 4px 0; }
   .gbc-entry {
     display: grid;
-    grid-template-columns: 90px 110px 110px 110px 1fr 36px;
+    grid-template-columns: 84px 100px 110px 100px 130px 1fr 32px;
     gap: 8px;
     padding: 8px 18px;
     border-bottom: 1px solid var(--rule-soft);
@@ -1439,7 +1439,7 @@
   .gbc-entry .gbe-del:hover { color: var(--behind); background: rgba(214,85,62,0.08); }
   .gbc-add-row {
     display: grid;
-    grid-template-columns: 90px 110px 110px 110px 1fr 80px;
+    grid-template-columns: 84px 100px 110px 100px 130px 1fr 72px;
     gap: 8px;
     padding: 8px 18px;
     background: rgba(122,160,194,0.04);
@@ -4329,25 +4329,83 @@ function renderSplitChip(e) {
   </button>`;
 }
 
-function paymentsForGuest(guestId) {
-  return (state.payments || []).filter(p => p.guestId === guestId);
+// Resolve a guest reference (id OR legacy name string) to a guest id
+function resolveGuestId(ref) {
+  if (!ref) return '';
+  const guests = state.guests || [];
+  if (guests.some(g => g.id === ref)) return ref;
+  const v = String(ref).toLowerCase().trim();
+  const match = guests.find(g => {
+    const fn = (g.first || '').toLowerCase();
+    const ln = (g.last || '').replace(/\(.*?\)/g,'').trim().toLowerCase();
+    return fn === v || `${fn} ${ln}`.trim() === v;
+  });
+  return match ? match.id : '';
 }
 
+function paymentsForGuest(guestId) {
+  // Payments this guest MADE
+  return (state.payments || []).filter(p => resolveGuestId(p.guestId) === guestId);
+}
+
+function frontedByGuest(guestId) {
+  return (state.expenses?.items || [])
+    .filter(e => resolveGuestId(e.paidBy) === guestId)
+    .reduce((s, e) => s + (Number(e.amount) || 0), 0);
+}
+
+function paidsMadeByGuest(guestId) {
+  return paymentsForGuest(guestId).reduce((s, p) => s + (Number(p.amount) || 0), 0);
+}
+
+function paidsReceivedByGuest(guestId) {
+  return (state.payments || [])
+    .filter(p => resolveGuestId(p.paidTo) === guestId)
+    .reduce((s, p) => s + (Number(p.amount) || 0), 0);
+}
+
+// Net amount this guest has contributed toward their share:
+// what they fronted + reimbursements they paid − reimbursements they received back
 function paidByGuest(guestId) {
-  // Direct reimbursement payments to the host
-  const fromPayments = paymentsForGuest(guestId).reduce((s, p) => s + (Number(p.amount) || 0), 0);
-  // Plus expenses they fronted (matched by guest id OR matching name for legacy data)
-  const guest = (state.guests || []).find(g => g.id === guestId);
-  const guestName = guest ? `${guest.first||''} ${(guest.last||'').replace(/\(.*?\)/g,'').trim()}`.trim().toLowerCase() : '';
-  const firstName = guest ? (guest.first || '').trim().toLowerCase() : '';
-  const fromFronted = (state.expenses?.items || []).filter(e => {
-    const pb = (e.paidBy || '').trim();
-    if (!pb) return false;
-    if (pb === guestId) return true;
-    const pbl = pb.toLowerCase();
-    return pbl === guestName || pbl === firstName;
-  }).reduce((s, e) => s + (Number(e.amount) || 0), 0);
-  return fromPayments + fromFronted;
+  return frontedByGuest(guestId) + paidsMadeByGuest(guestId) - paidsReceivedByGuest(guestId);
+}
+
+// Default recipient for a new payment = whoever the group owes the most (the host/front-er)
+function defaultRecipientId(excludeGuestId) {
+  let best = null, bestCredit = 0;
+  (state.guests || []).forEach(g => {
+    if (g.id === excludeGuestId) return;
+    if ((g.rsvp||'').toLowerCase() === 'declined') return;
+    const credit = paidByGuest(g.id) - owedByGuest(g.id); // positive = group owes them
+    if (credit > bestCredit) { bestCredit = credit; best = g.id; }
+  });
+  return best || '';
+}
+
+function guestNameById(id) {
+  const g = (state.guests || []).find(x => x.id === id);
+  if (!g) return '';
+  return `${g.first||''} ${(g.last||'').replace(/\(.*?\)/g,'').trim()}`.trim();
+}
+
+function recipientOptions(selectedRef) {
+  const sel = resolveGuestId(selectedRef);
+  return (state.guests || [])
+    .filter(g => (g.rsvp||'').toLowerCase() === 'confirmed')
+    .map(g => `<option value="${g.id}"${sel === g.id ? ' selected' : ''}>to ${escapeHTML(guestNameById(g.id))}</option>`)
+    .join('');
+}
+
+function recipientSelectHTML(currentValue, payerId, cls) {
+  const confirmed = (state.guests || []).filter(g => (g.rsvp||'').toLowerCase() === 'confirmed');
+  const selectedId = resolveGuestId(currentValue);
+  return `<select class="gbc-input ${cls||''}" data-pf="paidTo"${payerId?` data-payer="${payerId}"`:''}>
+    <option value="">to…</option>
+    ${confirmed.map(g => {
+      const name = `${g.first||''} ${(g.last||'').replace(/\(.*?\)/g,'').trim()}`.trim();
+      return `<option value="${g.id}"${selectedId === g.id ? ' selected' : ''}>to ${escapeHTML(name)}</option>`;
+    }).join('')}
+  </select>`;
 }
 
 function paidBySelectHTML(currentValue) {
@@ -4527,6 +4585,9 @@ function renderReimburseCards() {
               <option value="Zelle"${p.method==='Zelle'?' selected':''}>Zelle</option>
               <option value="Other"${p.method==='Other'?' selected':''}>Other</option>
             </select>
+            <select class="gbc-input gbe-to-input" data-pf="paidTo" data-pid="${p.id}">
+              <option value="">to…</option>${recipientOptions(p.paidTo)}
+            </select>
             <input type="text" class="gbc-input gbe-note-input" data-pf="note" data-pid="${p.id}" value="${escapeHTML(p.note||'')}" placeholder="Memo">
             <button class="gbe-del" data-pid="${p.id}" title="Delete">×</button>
           </div>`).join('')
@@ -4545,6 +4606,9 @@ function renderReimburseCards() {
           <option value="Cash">Cash</option>
           <option value="Zelle">Zelle</option>
           <option value="Other">Other</option>
+        </select>
+        <select class="gbc-input" data-f="paidTo">
+          <option value="">to…</option>${recipientOptions(defaultRecipientId(g.id))}
         </select>
         <input type="text" class="gbc-input gbe-note" data-f="note" placeholder="Memo (optional)">
         <button class="gbc-add-btn" data-add-entry>+ Add</button>
@@ -4618,6 +4682,7 @@ function renderReimburseCards() {
           type: vals.type || 'deposit',
           date: vals.date || new Date().toISOString().slice(0,10),
           method: vals.method || 'Venmo',
+          paidTo: vals.paidTo || '',
           note: (vals.note || '').trim()
         });
         persist();
@@ -4913,7 +4978,7 @@ function savePayment() {
   const method = document.getElementById('p-method').value;
   const note = document.getElementById('p-note').value.trim();
   state.payments = state.payments || [];
-  state.payments.push({ id: uid(), guestId: payModalGuestId, amount, type, date, method, note });
+  state.payments.push({ id: uid(), guestId: payModalGuestId, amount, type, date, method, note, paidTo: defaultRecipientId(payModalGuestId) });
   persist();
   closePayModal();
   renderExpenses();
